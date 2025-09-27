@@ -1,0 +1,54 @@
+[project]
+name = "javamcp"
+version = "0.0.1"
+description = "An AI MCP server to expose Java APIs/documentations to AI coding assistants."
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICEN[CS]E*"]
+requires-python = ">=3.13,<3.14"
+keywords = [ "AI", "MCP", "coding", "assistant"  ]
+authors = [
+    { name = "Rubens Gomes", email = "rubens.s.gomes@gmail.com" }
+]
+maintainers = [
+    { name = "Rubens Gomes", email = "rubens.s.gomes@gmail.com" }
+]
+classifiers = [
+    # How mature is this project? Common values are
+    #   3 - Alpha
+    #   4 - Beta
+    #   5 - Production/Stable
+    "Development Status :: 3 - Alpha",
+    # Indicate who your project is intended for
+    "Intended Audience :: Software Engineer",
+    "Topic :: Software Development :: MCP Server",
+    # Specify the Python versions you support here.
+    "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+    "fastmcp (>=2.11.3,<3.0.0)",
+    "GitPython (>=3.1.45,<4.0.0)",
+    "antlr4-python3-runtime (>=4.13.2,<5.0.0)",
+    "pydantic (>=2.11.7,<3.0.0)",
+]
+packages = [{include = "javamcp", from = "src"}]
+
+[project.urls]
+Homepage = "https://github.com/rubensgomes/javamcp/"
+Documentation = "https://github.com/rubensgomes/javamcp/README.md"
+Repository = "https://github.com/rubensgomes/javamcp/"
+
+[tool.poetry.group.dev.dependencies]
+coverage = "^7.10.4"
+pytest = "^8.4.1"
+pytest-mock = "^3.14.1"
+python-semantic-release = "^10.3.1"
+
+[tool.semantic_release]
+version_toml = ["pyproject.toml:project.version"]
+build_command = "poetry build"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
