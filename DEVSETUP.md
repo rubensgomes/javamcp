@@ -13,8 +13,8 @@ environments.
 brew install python3
 brew install pipx
 # Generic commands
+pip install antlr4-python3-runtime
 pipx ensurepath
-pipx install antlr4-tools
 pipx install pylint
 pipx install pytest
 pipx install poetry
