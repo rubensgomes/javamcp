@@ -17,6 +17,16 @@ from .repositories import (
     RepositoryNotFoundError
 )
 
+from .indexer import (
+    JavaPathIndexer,
+    IndexerConfig,
+    IndexResult,
+    JavaFilePath,
+    IndexerError,
+    DirectoryAccessError,
+    NoJavaFilesFoundError
+)
+
 __version__ = "0.0.1"
 
 __all__ = [
@@ -28,4 +38,11 @@ __all__ = [
     "RepositoryCloneError",
     "RepositorySyncError",
     "RepositoryNotFoundError",
+    "JavaPathIndexer",
+    "IndexerConfig",
+    "IndexResult",
+    "JavaFilePath",
+    "IndexerError",
+    "DirectoryAccessError",
+    "NoJavaFilesFoundError",
 ]
