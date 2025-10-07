@@ -10,10 +10,11 @@ Javadocs, method signatures, class hierarchies, and usage examples.
 __version__ = "0.1.0"
 __author__ = "JavaMCP Contributors"
 
-from javamcp.server import JavaMCPServer, create_server
+from javamcp.server import get_state, initialize_server, mcp
 
 __all__ = [
-    "JavaMCPServer",
-    "create_server",
+    "mcp",
+    "initialize_server",
+    "get_state",
     "__version__",
 ]

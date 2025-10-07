@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2025-10-06
+
+### Added
+- FastMCP framework integration for proper MCP server implementation
+- Graceful shutdown signal handlers for SIGINT and SIGTERM
+- ServerState class for shared component management across tools
+- 5 new signal handler tests (247 total tests)
+- Comprehensive signal handling with resource cleanup
+
+### Changed
+- **BREAKING**: Refactored server.py to use FastMCP decorators
+- **BREAKING**: All 4 tools now use `@mcp.tool()` decorator pattern
+- **BREAKING**: Server API changed from JavaMCPServer class to FastMCP-based implementation
+- Simplified server startup using `mcp.run()`
+- Updated exports: `mcp`, `initialize_server`, `get_state` (replaces `JavaMCPServer`, `create_server`)
+
+### Migration Guide
+- Old import: `from javamcp import JavaMCPServer, create_server`
+- New import: `from javamcp import mcp, initialize_server, get_state`
+- Original tool functions preserved in `src/javamcp/tools/` for backward compatibility
+
+### Technical
+- Server now uses global ServerState for component sharing
+- Signal handlers properly clean up indexer and log shutdown events
+- All tests updated for FastMCP compatibility
+- Code quality maintained: pylint 10.00/10, 95%+ coverage
+
 ## [0.1.0] - 2025-10-06
 
 ### Added
@@ -35,4 +62,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fast search and filtering capabilities
 - Context-aware responses for AI coding assistants
 
+[0.2.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.2.0
 [0.1.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.1.0

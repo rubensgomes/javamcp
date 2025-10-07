@@ -150,17 +150,6 @@ poetry run python -m semantic_release -vvv version
 poetry run python -m semantic_release -vvv publish
 ```
 
-## Running the main program
-
-- To display the program version:
-
-    ```shell
-    PACKAGE="javamcp"
-    PYTHONPATH="$(git rev-parse --show-toplevel)"
-    export PYTHONPATH
-    python3 "${PACKAGE}/main.py"
-    ```
-
 ## PyCharm IDE Development Environment
 
 - First, ensure to follow all the previous steps to "Setting Up Shell
