@@ -90,6 +90,8 @@ class LoggingConfig(BaseModel):
         format: Log message format
         output: Log output destination ("console", "file", or "both")
         file_path: Log file path (required if output is "file" or "both")
+        max_bytes: Maximum size in bytes before rotating log file (default: 10MB)
+        backup_count: Number of backup log files to keep (default: 5)
     """
 
     level: str = Field(default="INFO", description="Log level")
@@ -99,6 +101,12 @@ class LoggingConfig(BaseModel):
     )
     output: str = Field(default="console", description="Log output destination")
     file_path: Optional[str] = Field(None, description="Log file path")
+    max_bytes: int = Field(
+        default=10485760, description="Maximum log file size before rotation (bytes)"
+    )
+    backup_count: int = Field(
+        default=5, description="Number of backup log files to keep"
+    )
 
     @field_validator("level")
     @classmethod
@@ -119,6 +127,22 @@ class LoggingConfig(BaseModel):
         if v_lower not in valid_outputs:
             raise ValueError(f"Log output must be one of {valid_outputs}")
         return v_lower
+
+    @field_validator("max_bytes")
+    @classmethod
+    def validate_max_bytes(cls, v: int) -> int:
+        """Validate max_bytes is positive."""
+        if v <= 0:
+            raise ValueError("max_bytes must be positive")
+        return v
+
+    @field_validator("backup_count")
+    @classmethod
+    def validate_backup_count(cls, v: int) -> int:
+        """Validate backup_count is non-negative."""
+        if v < 0:
+            raise ValueError("backup_count must be non-negative")
+        return v
 
 
 class ApplicationConfig(BaseModel):

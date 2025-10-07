@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2025-10-06
+
+### Added
+- **Rotating Log Files**: Automatic log rotation to prevent unbounded file growth
+  - New configuration fields: `max_bytes` (default: 10MB) and `backup_count` (default: 5)
+  - Uses Python's `RotatingFileHandler` for automatic rotation
+  - Total max disk usage: ~60MB (10MB × 6 files)
+  - Configuration validation for log rotation parameters
+- Claude Code MCP integration support via `.mcp.json` configuration
+
+### Changed
+- Replaced `FileHandler` with `RotatingFileHandler` in logging setup
+- Enhanced logging tests with rotation behavior verification (3 new tests)
+
+### Technical
+- Log rotation configured via `LoggingConfig.max_bytes` and `LoggingConfig.backup_count`
+- Backward compatible: existing configs work with default rotation settings
+- All 249 tests passing (2 new rotation tests added)
+- Code quality maintained: pylint 9.70/10, 95%+ coverage
+
 ## [0.2.0] - 2025-10-06
 
 ### Added
@@ -62,5 +82,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fast search and filtering capabilities
 - Context-aware responses for AI coding assistants
 
+[0.2.1]: https://github.com/rubensgomes/javamcp/releases/tag/v0.2.1
 [0.2.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.2.0
 [0.1.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.1.0

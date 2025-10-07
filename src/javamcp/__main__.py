@@ -7,6 +7,7 @@ import argparse
 import signal
 import sys
 
+from javamcp import __version__
 from javamcp.config.loader import load_config
 from javamcp.logging import (get_logger, log_server_shutdown,
                              log_server_startup, setup_logging)
@@ -65,6 +66,12 @@ def main() -> int:
     """
     parser = argparse.ArgumentParser(
         description="JavaMCP Server - MCP server for Java API documentation"
+    )
+    parser.add_argument(
+        "--version",
+        "-v",
+        action="version",
+        version=f"JavaMCP {__version__}",
     )
     parser.add_argument(
         "--config",

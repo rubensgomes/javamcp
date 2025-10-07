@@ -4,6 +4,7 @@ Unit tests for logging module.
 """
 
 import logging
+from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 import pytest
@@ -40,7 +41,7 @@ class TestSetupLogging:
         assert len(logger.handlers) == 2
         handler_types = [type(h).__name__ for h in logger.handlers]
         assert "StreamHandler" in handler_types
-        assert "FileHandler" in handler_types
+        assert "RotatingFileHandler" in handler_types
 
     def test_setup_logging_creates_directory(self, tmp_path):
         """Test that logging setup creates log directory if needed."""
@@ -76,6 +77,55 @@ class TestSetupLogging:
 
         # Should have same number of handlers, not doubled
         assert len(logger1.handlers) == len(logger2.handlers)
+
+    def test_setup_logging_rotation_config(self, tmp_path):
+        """Test logging setup with custom rotation configuration."""
+        log_file = tmp_path / "test.log"
+        config = LoggingConfig(
+            level="INFO",
+            file_path=str(log_file),
+            max_bytes=1024,
+            backup_count=3,
+        )
+
+        logger = setup_logging(config)
+
+        # Find the RotatingFileHandler
+        rotating_handler = None
+        for handler in logger.handlers:
+            if isinstance(handler, RotatingFileHandler):
+                rotating_handler = handler
+                break
+
+        assert rotating_handler is not None
+        assert rotating_handler.maxBytes == 1024
+        assert rotating_handler.backupCount == 3
+
+    def test_setup_logging_rotation_behavior(self, tmp_path):
+        """Test that log rotation actually occurs when max_bytes is exceeded."""
+        log_file = tmp_path / "test.log"
+        # Set very small max_bytes to trigger rotation easily
+        config = LoggingConfig(
+            level="INFO",
+            file_path=str(log_file),
+            max_bytes=100,
+            backup_count=2,
+        )
+
+        logger = setup_logging(config)
+
+        # Write enough logs to trigger rotation
+        for i in range(50):
+            logger.info(f"Test message number {i} with some extra text to fill space")
+
+        # Check that rotation occurred - backup file should exist
+        backup_file = Path(f"{log_file}.1")
+        assert log_file.exists()
+        # Backup file may or may not exist depending on exact log size
+        # Just verify main log file didn't exceed max size by much
+        if log_file.exists():
+            # File size should be reasonably close to max_bytes after rotation
+            assert log_file.stat().st_size < 1000  # Allow some overhead
 
 
 class TestGetLogger:

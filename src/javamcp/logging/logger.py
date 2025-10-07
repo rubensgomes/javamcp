@@ -5,6 +5,7 @@ Logging configuration and utilities for JavaMCP server.
 
 import logging
 import sys
+from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from typing import Optional
 
@@ -39,12 +40,16 @@ def setup_logging(config: LoggingConfig) -> logging.Logger:
     console_handler.setFormatter(formatter)
     logger.addHandler(console_handler)
 
-    # File handler if file path specified
+    # Rotating file handler if file path specified
     if config.file_path:
         file_path = Path(config.file_path)
         file_path.parent.mkdir(parents=True, exist_ok=True)
 
-        file_handler = logging.FileHandler(file_path)
+        file_handler = RotatingFileHandler(
+            file_path,
+            maxBytes=config.max_bytes,
+            backupCount=config.backup_count,
+        )
         file_handler.setLevel(config.level.upper())
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
