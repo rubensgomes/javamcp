@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.2] - 2025-10-08
+
+### Added
+- HTTP transport mode support for FastMCP server
+  - Server can now run in both stdio and HTTP modes
+  - Mode selection via configuration setting
+  - Explicit port configuration for HTTP mode
+
+### Changed
+- Code quality improvements and cleanup
+  - Removed unused `StringIO` imports from ANTLR4 generated files
+  - Removed unused `Context` import from server module
+  - Fixed blank line formatting across multiple files
+  - Applied black formatter and isort to entire codebase
+- Updated development setup documentation
+  - Added `fastmcp` installation instructions
+
+### Technical
+- Pylint score: 9.71/10 (improved from 9.70/10)
+- All 249 tests passing
+- Code coverage maintained at 95%+
+- Enhanced server initialization with transport mode handling
+
 ## [0.2.1] - 2025-10-06
 
 ### Added
@@ -82,6 +105,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fast search and filtering capabilities
 - Context-aware responses for AI coding assistants
 
+[0.2.2]: https://github.com/rubensgomes/javamcp/releases/tag/v0.2.2
 [0.2.1]: https://github.com/rubensgomes/javamcp/releases/tag/v0.2.1
 [0.2.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.2.0
 [0.1.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.1.0

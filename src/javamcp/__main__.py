@@ -101,7 +101,12 @@ def main() -> int:
         logger.info("Starting FastMCP server...")
 
         # Start FastMCP server - this handles stdio/http modes automatically
-        mcp.run()
+        if config.mode == "stdio":
+            logger.info("Running FastMCP in stdio mode.")
+            mcp.run()
+        else:
+            logger.info("Running FastMCP in normal HTTP mode.")
+            mcp.run(transport="http", port=config.server.port)
 
         # Shutdown logging (only reached if server stops normally)
         log_server_shutdown(logger)

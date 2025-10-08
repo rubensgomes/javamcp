@@ -5,7 +5,7 @@ FastMCP server for exposing Java APIs to AI assistants.
 
 from typing import Optional
 
-from fastmcp import Context, FastMCP
+from fastmcp import FastMCP
 
 from javamcp.config.loader import load_config
 from javamcp.config.schema import ApplicationConfig, RepositoryConfig

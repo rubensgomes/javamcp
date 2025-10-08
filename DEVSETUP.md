@@ -15,6 +15,7 @@ brew install pipx
 # Generic commands
 pip install antlr4-python3-runtime
 pipx ensurepath
+pipx install fastmcp
 pipx install pylint
 pipx install pytest
 pipx install poetry

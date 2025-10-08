@@ -12,9 +12,9 @@
     "branch": "main"
   },
   "logging": {
-    "level": "INFO",
+    "level": "DEBUG",
     "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    "output": "console",
-    "file_path": null
+    "output": "both",
+    "file_path": "/tmp/javamcp.log"
   }
 }
