@@ -1,6 +1,13 @@
 # JavaMCP
 
-A Python-based MCP (Model Context Protocol) server that provides AI coding assistants with rich contextual information about Java APIs, including Javadocs, method signatures, class hierarchies, and usage examples.
+A Python-based MCP (Model Context Protocol) server that provides AI coding
+assistants with rich contextual information about Java APIs, including Javadocs,
+method signatures, class hierarchies, and usage examples.
+
+## AI General Disclaimer
+
+fOR **AI-GENERATED CONTENT**, please refer to the AI-GENERATED CONTENT
+[DISCLAIMER](DISCLAIMER.md)
 
 ## Features
 
@@ -35,7 +42,9 @@ A Python-based MCP (Model Context Protocol) server that provides AI coding assis
 
 3. **Generate ANTLR4 Parser (one-time setup):**
 
-   Download Java 21+ grammars from [ANTLR Grammars](https://github.com/antlr/grammars-v4/tree/master/java/java) to the project `grammars` folder:
+   Download Java 21+ grammars
+   from [ANTLR Grammars](https://github.com/antlr/grammars-v4/tree/master/java/java)
+   to the project `grammars` folder:
 
    ```bash
    pushd grammars
@@ -56,18 +65,18 @@ Edit `config.yaml` to add your Java repositories:
 
 ```yaml
 server:
-  mode: stdio
+    mode: stdio
 
 repositories:
-  urls:
-    - https://github.com/apache/commons-lang.git
-    - https://github.com/google/guava.git
-  local_base_path: ./repositories
-  branch: main
+    urls:
+        - https://github.com/apache/commons-lang.git
+        - https://github.com/google/guava.git
+    local_base_path: ./repositories
+    branch: main
 
 logging:
-  level: INFO
-  output: console
+    level: INFO
+    output: console
 ```
 
 ## Usage
@@ -83,18 +92,21 @@ poetry run python -m javamcp --config config.yaml
 JavaMCP provides 4 MCP tools for AI assistants:
 
 #### 1. Search Methods (`search_methods`)
+
 Search for Java methods by name with full context.
 
 **Request:**
+
 ```json
 {
-  "method_name": "substring",
-  "class_name": "String",
-  "case_sensitive": false
+    "method_name": "substring",
+    "class_name": "String",
+    "case_sensitive": false
 }
 ```
 
 **Response:**
+
 - Method signature
 - Javadoc summary and description
 - Parameter descriptions
@@ -102,17 +114,20 @@ Search for Java methods by name with full context.
 - Containing class information
 
 #### 2. Analyze Class (`analyze_class`)
+
 Get complete information about a Java class.
 
 **Request:**
+
 ```json
 {
-  "fully_qualified_name": "java.lang.String",
-  "repository_name": "jdk"
+    "fully_qualified_name": "java.lang.String",
+    "repository_name": "jdk"
 }
 ```
 
 **Response:**
+
 - Class-level Javadoc
 - All methods with Javadocs
 - All fields with Javadocs
@@ -120,35 +135,41 @@ Get complete information about a Java class.
 - Annotations
 
 #### 3. Extract APIs (`extract_apis`)
+
 Extract and index APIs from a Git repository.
 
 **Request:**
+
 ```json
 {
-  "repository_url": "https://github.com/apache/commons-lang.git",
-  "branch": "main",
-  "package_filter": "org.apache.commons.lang3",
-  "class_filter": "String"
+    "repository_url": "https://github.com/apache/commons-lang.git",
+    "branch": "main",
+    "package_filter": "org.apache.commons.lang3",
+    "class_filter": "String"
 }
 ```
 
 **Response:**
+
 - List of extracted classes with Javadocs
 - Total classes and methods indexed
 - API summaries
 
 #### 4. Generate Usage Guide (`generate_guide`)
+
 Generate usage guides for specific use cases.
 
 **Request:**
+
 ```json
 {
-  "use_case": "How to manipulate strings",
-  "max_results": 10
+    "use_case": "How to manipulate strings",
+    "max_results": 10
 }
 ```
 
 **Response:**
+
 - Relevant classes and methods
 - Javadoc-based usage examples
 - Formatted guide with context
@@ -162,14 +183,18 @@ JavaMCP provides 1 MCP resource for accessing project-level information:
 Access comprehensive contextual information about a Java API project.
 
 **URI Pattern:**
+
 ```
 javamcp://project/{repository_name}/context
 ```
 
 **Parameters:**
-- `repository_name`: Repository name (extracted from Git URL, e.g., "commons-lang" for "https://github.com/apache/commons-lang.git")
+
+- `repository_name`: Repository name (extracted from Git URL, e.g., "
+  commons-lang" for "https://github.com/apache/commons-lang.git")
 
 **Response includes:**
+
 - **Repository Information**: Name and URL
 - **Project Description**: Generated overview with statistics
 - **README Content**: Full README.md file content (if available)
@@ -181,51 +206,59 @@ javamcp://project/{repository_name}/context
 
 **Example Usage:**
 
-If you have indexed `https://github.com/apache/commons-lang.git`, access its context via:
+If you have indexed `https://github.com/apache/commons-lang.git`, access its
+context via:
+
 ```
 javamcp://project/commons-lang/context
 ```
 
 **Response Structure:**
+
 ```json
 {
-  "repository_name": "commons-lang",
-  "repository_url": "https://github.com/apache/commons-lang.git",
-  "description": "# commons-lang\n\nRepository: https://github.com/apache/commons-lang.git...",
-  "readme_content": "# Apache Commons Lang...",
-  "llms_txt_content": null,
-  "statistics": {
-    "total_classes": 150,
-    "total_methods": 2500,
-    "total_packages": 15,
-    "average_methods_per_class": 16.67
-  },
-  "packages": [
-    {
-      "name": "org.apache.commons.lang3",
-      "class_count": 50,
-      "method_count": 800,
-      "classes": ["StringUtils", "ArrayUtils", "ObjectUtils", ...]
+    "repository_name": "commons-lang",
+    "repository_url": "https://github.com/apache/commons-lang.git",
+    "description": "# commons-lang\n\nRepository: https://github.com/apache/commons-lang.git...",
+    "readme_content": "# Apache Commons Lang...",
+    "llms_txt_content": null,
+    "statistics": {
+        "total_classes": 150,
+        "total_methods": 2500,
+        "total_packages": 15,
+        "average_methods_per_class": 16.67
+    },
+    "packages": [
+        {
+            "name": "org.apache.commons.lang3",
+            "class_count": 50,
+            "method_count": 800,
+            "classes": [
+                "StringUtils",
+                "ArrayUtils",
+                "ObjectUtils",
+                ...
+            ]
+        }
+    ],
+    "top_classes": [
+        {
+            "name": "StringUtils",
+            "fully_qualified_name": "org.apache.commons.lang3.StringUtils",
+            "package": "org.apache.commons.lang3",
+            "summary": "Operations on String that are null safe",
+            "method_count": 120,
+            "type": "class"
+        }
+    ],
+    "javadoc_coverage": {
+        "class_documentation_rate": 95.5,
+        "method_documentation_rate": 87.3,
+        "documented_classes": 143,
+        "total_classes": 150,
+        "documented_methods": 2183,
+        "total_methods": 2500
     }
-  ],
-  "top_classes": [
-    {
-      "name": "StringUtils",
-      "fully_qualified_name": "org.apache.commons.lang3.StringUtils",
-      "package": "org.apache.commons.lang3",
-      "summary": "Operations on String that are null safe",
-      "method_count": 120,
-      "type": "class"
-    }
-  ],
-  "javadoc_coverage": {
-    "class_documentation_rate": 95.5,
-    "method_documentation_rate": 87.3,
-    "documented_classes": 143,
-    "total_classes": 150,
-    "documented_methods": 2183,
-    "total_methods": 2500
-  }
 }
 ```
 
@@ -285,6 +318,7 @@ javamcp/
 ## Contributing
 
 Contributions are welcome! Please ensure:
+
 - All tests pass
 - Code coverage remains above 80%
 - Code follows Black formatting
@@ -293,7 +327,3 @@ Contributions are welcome! Please ensure:
 ## License
 
 [Apache Version 2.0 License](LICENSE)
-
-## Author
-
-[Rubens Gomes](https://rubensgomes.com/)

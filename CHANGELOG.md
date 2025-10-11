@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2025-10-11
+
+### Added
+- **DISCLAIMER.md**: Comprehensive AI-Generated Content Disclaimer
+  - Clarifies AI LLM involvement in project creation
+  - Explains copyright status (public domain for AI-generated portions)
+  - Includes third-party content notice and limitations
+  - Provides no-warranty disclaimer and limitation of liability
+- **AI Disclaimer Headers**: Added to all 72 Python source files
+  - Replaces previous Apache 2.0 license headers
+  - Includes AI content notice, copyright status, and liability limitations
+  - Placed at top of every source and test file
+
+### Changed
+- **Licensing Model**: Transitioned from Apache 2.0 to AI-Generated Content Disclaimer
+  - Removed LICENSE file (Apache 2.0)
+  - AI-generated portions now in public domain
+  - Copyright protection limited to original human contributions only
+- **README.md**: Added prominent AI General Disclaimer section at top
+
+### Removed
+- **LICENSE file**: Apache 2.0 license removed
+
+### Technical
+- No functional changes or breaking changes
+- All 262 tests passing
+- Code coverage maintained at 52%
+- Pylint score maintained at ~9.73/10
+- Fully backward compatible
+
 ## [0.3.0] - 2025-10-11
 
 ### Added
@@ -150,6 +180,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fast search and filtering capabilities
 - Context-aware responses for AI coding assistants
 
+[0.4.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.4.0
 [0.3.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.3.0
 [0.2.3]: https://github.com/rubensgomes/javamcp/releases/tag/v0.2.3
 [0.2.2]: https://github.com/rubensgomes/javamcp/releases/tag/v0.2.2
