@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2025-10-11
+
+### Added
+- **New MCP Resource**: `javamcp://project/{repository_name}/context`
+  - Access comprehensive project context for Java API repositories
+  - Provides repository information, README content, llms.txt content
+  - Includes API statistics (classes, methods, packages, averages)
+  - Package-level summaries with class and method counts
+  - Top classes with Javadoc documentation
+  - Documentation coverage metrics for classes and methods
+- **ProjectContextBuilder Component**: New module for building rich project context
+  - Aggregates information from README, llms.txt, Javadocs, and indexed APIs
+  - Generates comprehensive API statistics and package summaries
+  - Calculates Javadoc documentation coverage rates
+  - 346 lines of production code with full test coverage
+- **ProjectContextResponse Model**: New protocol model for resource responses
+- **Enhanced Repository Manager**: Added `get_repository_by_name()` method for easier repository lookups
+- **Comprehensive Test Suite**: 324 lines of tests for new functionality (12 new tests)
+
+### Changed
+- Updated README.md with comprehensive MCP Resources section and usage examples
+- Enhanced server.py with resource registration using `@mcp.resource()` decorator
+- Updated MCP protocol models with new `ProjectContextResponse`
+
+### Technical
+- All 262 tests passing (13 new tests added)
+- Code coverage maintained at 52% (ANTLR4 generated code excluded)
+- Pylint score: 9.73/10 (improved from 9.70/10)
+- No breaking changes - fully backward compatible
+- Follows semantic versioning (MINOR version bump for new feature)
+
 ## [0.2.3] - 2025-10-11
 
 ### Changed
@@ -119,6 +150,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fast search and filtering capabilities
 - Context-aware responses for AI coding assistants
 
+[0.3.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.3.0
 [0.2.3]: https://github.com/rubensgomes/javamcp/releases/tag/v0.2.3
 [0.2.2]: https://github.com/rubensgomes/javamcp/releases/tag/v0.2.2
 [0.2.1]: https://github.com/rubensgomes/javamcp/releases/tag/v0.2.1

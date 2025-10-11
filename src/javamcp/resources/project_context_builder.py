@@ -1,0 +1,346 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2025 Rubens Gomes
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""
+Project context builder for generating comprehensive project documentation.
+"""
+
+from pathlib import Path
+from typing import Optional
+
+from javamcp.context.context_builder import ContextBuilder
+from javamcp.indexer.indexer import APIIndexer
+from javamcp.indexer.query_engine import QueryEngine
+from javamcp.repository.manager import RepositoryManager
+
+
+class ProjectContextBuilder:
+    """
+    Builds comprehensive contextual information about a Java API project.
+
+    Aggregates information from README files, llms.txt, Javadocs,
+    and indexed API data to create rich project documentation.
+    """
+
+    def __init__(
+        self,
+        repository_manager: RepositoryManager,
+        indexer: APIIndexer,
+        query_engine: QueryEngine,
+    ):
+        """
+        Initialize project context builder.
+
+        Args:
+            repository_manager: Repository manager for accessing repo files
+            indexer: API indexer for accessing indexed classes
+            query_engine: Query engine for searching APIs
+        """
+        self.repository_manager = repository_manager
+        self.indexer = indexer
+        self.query_engine = query_engine
+        self.context_builder = ContextBuilder()
+
+    def build_project_context(self, repository_url: str) -> dict:
+        """
+        Build comprehensive project context for a repository.
+
+        Args:
+            repository_url: Repository URL to build context for
+
+        Returns:
+            Dictionary containing complete project context
+        """
+        metadata = self.repository_manager.get_repository_metadata(repository_url)
+        if not metadata:
+            return {"error": f"Repository not found: {repository_url}"}
+
+        repo_path = Path(metadata.local_path)
+        repository_name = self._extract_repository_name(repository_url)
+
+        context = {
+            "repository_name": repository_name,
+            "repository_url": repository_url,
+            "description": self._format_project_description(repository_url, repo_path),
+            "readme_content": self._extract_readme_content(repo_path),
+            "llms_txt_content": self._extract_llms_txt(repo_path),
+            "statistics": self._build_api_statistics(repository_url),
+            "packages": self._build_package_summary(repository_url),
+            "top_classes": self._build_top_classes_summary(repository_url, limit=10),
+            "javadoc_coverage": self._calculate_javadoc_coverage(repository_url),
+        }
+
+        return context
+
+    def _extract_repository_name(self, repository_url: str) -> str:
+        """
+        Extract repository name from URL.
+
+        Args:
+            repository_url: Repository URL
+
+        Returns:
+            Repository name
+        """
+        name = repository_url.rstrip("/").split("/")[-1]
+        if name.endswith(".git"):
+            name = name[:-4]
+        return name
+
+    def _extract_readme_content(self, repo_path: Path) -> Optional[str]:
+        """
+        Extract README.md content from repository.
+
+        Args:
+            repo_path: Path to repository
+
+        Returns:
+            README content or None if not found
+        """
+        readme_candidates = ["README.md", "README", "readme.md", "Readme.md"]
+
+        for readme_name in readme_candidates:
+            readme_path = repo_path / readme_name
+            if readme_path.exists() and readme_path.is_file():
+                try:
+                    return readme_path.read_text(encoding="utf-8")
+                except (OSError, UnicodeDecodeError):
+                    continue
+
+        return None
+
+    def _extract_llms_txt(self, repo_path: Path) -> Optional[str]:
+        """
+        Extract llms.txt or LLMs.txt content from repository.
+
+        Args:
+            repo_path: Path to repository
+
+        Returns:
+            llms.txt content or None if not found
+        """
+        llms_candidates = ["llms.txt", "LLMs.txt", "LLMS.txt"]
+
+        for llms_name in llms_candidates:
+            llms_path = repo_path / llms_name
+            if llms_path.exists() and llms_path.is_file():
+                try:
+                    return llms_path.read_text(encoding="utf-8")
+                except (OSError, UnicodeDecodeError):
+                    continue
+
+        return None
+
+    def _build_api_statistics(self, repository_url: str) -> dict:
+        """
+        Build API statistics for repository.
+
+        Args:
+            repository_url: Repository URL
+
+        Returns:
+            Dictionary with statistics
+        """
+        try:
+            classes = self.query_engine.get_all_apis_from_repository(repository_url)
+            total_methods = sum(len(cls.methods) for cls in classes)
+
+            packages = set(cls.package for cls in classes)
+
+            return {
+                "total_classes": len(classes),
+                "total_methods": total_methods,
+                "total_packages": len(packages),
+                "average_methods_per_class": (
+                    round(total_methods / len(classes), 2) if classes else 0
+                ),
+            }
+        except Exception:  # pylint: disable=broad-exception-caught
+            return {
+                "total_classes": 0,
+                "total_methods": 0,
+                "total_packages": 0,
+                "average_methods_per_class": 0,
+            }
+
+    def _build_package_summary(self, repository_url: str) -> list[dict]:
+        """
+        Build summary of packages in repository.
+
+        Args:
+            repository_url: Repository URL
+
+        Returns:
+            List of package summaries
+        """
+        try:
+            classes = self.query_engine.get_all_apis_from_repository(repository_url)
+
+            packages_map = {}
+            for cls in classes:
+                if cls.package not in packages_map:
+                    packages_map[cls.package] = []
+                packages_map[cls.package].append(cls)
+
+            package_summaries = []
+            for package_name, package_classes in packages_map.items():
+                total_methods = sum(len(cls.methods) for cls in package_classes)
+
+                package_summaries.append(
+                    {
+                        "name": package_name,
+                        "class_count": len(package_classes),
+                        "method_count": total_methods,
+                        "classes": [cls.name for cls in package_classes[:5]],
+                    }
+                )
+
+            return sorted(
+                package_summaries, key=lambda x: x["class_count"], reverse=True
+            )
+        except Exception:  # pylint: disable=broad-exception-caught
+            return []
+
+    def _build_top_classes_summary(
+        self, repository_url: str, limit: int = 10
+    ) -> list[dict]:
+        """
+        Build summary of top N classes with most context.
+
+        Args:
+            repository_url: Repository URL
+            limit: Maximum number of classes to include
+
+        Returns:
+            List of class summaries with Javadocs
+        """
+        try:
+            classes = self.query_engine.get_all_apis_from_repository(repository_url)
+
+            classes_with_docs = [cls for cls in classes if cls.javadoc]
+
+            sorted_classes = sorted(
+                classes_with_docs,
+                key=lambda x: len(x.methods) + (10 if x.javadoc else 0),
+                reverse=True,
+            )
+
+            top_classes = []
+            for cls in sorted_classes[:limit]:
+                context = self.context_builder.build_class_context(
+                    cls, include_methods=False
+                )
+                top_classes.append(
+                    {
+                        "name": cls.name,
+                        "fully_qualified_name": cls.fully_qualified_name,
+                        "package": cls.package,
+                        "summary": context.get("summary", ""),
+                        "method_count": len(cls.methods),
+                        "type": context.get("type", "class"),
+                    }
+                )
+
+            return top_classes
+        except Exception:  # pylint: disable=broad-exception-caught
+            return []
+
+    def _calculate_javadoc_coverage(self, repository_url: str) -> dict:
+        """
+        Calculate Javadoc coverage metrics.
+
+        Args:
+            repository_url: Repository URL
+
+        Returns:
+            Dictionary with coverage metrics
+        """
+        try:
+            classes = self.query_engine.get_all_apis_from_repository(repository_url)
+
+            total_classes = len(classes)
+            classes_with_javadoc = sum(1 for cls in classes if cls.javadoc)
+
+            total_methods = sum(len(cls.methods) for cls in classes)
+            methods_with_javadoc = sum(
+                sum(1 for method in cls.methods if method.javadoc) for cls in classes
+            )
+
+            return {
+                "class_documentation_rate": (
+                    round((classes_with_javadoc / total_classes) * 100, 2)
+                    if total_classes > 0
+                    else 0
+                ),
+                "method_documentation_rate": (
+                    round((methods_with_javadoc / total_methods) * 100, 2)
+                    if total_methods > 0
+                    else 0
+                ),
+                "documented_classes": classes_with_javadoc,
+                "total_classes": total_classes,
+                "documented_methods": methods_with_javadoc,
+                "total_methods": total_methods,
+            }
+        except Exception:  # pylint: disable=broad-exception-caught
+            return {
+                "class_documentation_rate": 0,
+                "method_documentation_rate": 0,
+                "documented_classes": 0,
+                "total_classes": 0,
+                "documented_methods": 0,
+                "total_methods": 0,
+            }
+
+    def _format_project_description(self, repository_url: str, repo_path: Path) -> str:
+        """
+        Generate comprehensive project description.
+
+        Args:
+            repository_url: Repository URL
+            repo_path: Path to repository
+
+        Returns:
+            Formatted project description
+        """
+        repository_name = self._extract_repository_name(repository_url)
+        stats = self._build_api_statistics(repository_url)
+
+        description_parts = [
+            f"# {repository_name}",
+            "",
+            f"Repository: {repository_url}",
+            "",
+            "## API Statistics",
+            f"- Total Classes: {stats['total_classes']}",
+            f"- Total Methods: {stats['total_methods']}",
+            f"- Total Packages: {stats['total_packages']}",
+            f"- Average Methods per Class: {stats['average_methods_per_class']}",
+            "",
+        ]
+
+        readme_content = self._extract_readme_content(repo_path)
+        if readme_content:
+            description_parts.extend(
+                [
+                    "## Project Overview (from README)",
+                    "",
+                    readme_content[:1000]
+                    + ("..." if len(readme_content) > 1000 else ""),
+                    "",
+                ]
+            )
+
+        return "\n".join(description_parts)

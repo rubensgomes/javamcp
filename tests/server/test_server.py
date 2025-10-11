@@ -163,3 +163,17 @@ class TestFastMCPTools:
 
         assert generate_guide is not None
         assert hasattr(generate_guide, "__name__") or hasattr(generate_guide, "name")
+
+
+class TestFastMCPResources:
+    """Tests for FastMCP resource decorators."""
+
+    def test_get_project_context_resource_exists(self):
+        """Test that get_project_context resource is registered."""
+        from javamcp.server import get_project_context
+
+        assert get_project_context is not None
+        # FastMCP wraps resources in FunctionResourceTemplate
+        assert hasattr(get_project_context, "name") or hasattr(
+            get_project_context, "uri_template"
+        )

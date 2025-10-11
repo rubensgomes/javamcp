@@ -157,6 +157,37 @@ class RepositoryManager:
         """
         return self.repositories.get(url)
 
+    def get_repository_by_name(self, name: str) -> Optional[RepositoryMetadata]:
+        """
+        Get repository metadata by repository name.
+
+        Args:
+            name: Repository name (extracted from URL)
+
+        Returns:
+            RepositoryMetadata or None if not found
+        """
+        for url, metadata in self.repositories.items():
+            repo_name = self._get_repo_name_from_url(url)
+            if repo_name == name:
+                return metadata
+        return None
+
+    def get_repository_path(self, url: str) -> Optional[Path]:
+        """
+        Get local file system path for a repository.
+
+        Args:
+            url: Repository URL
+
+        Returns:
+            Path to repository or None if not found
+        """
+        metadata = self.get_repository_metadata(url)
+        if metadata:
+            return Path(metadata.local_path)
+        return None
+
     def _get_repo_name_from_url(self, url: str) -> str:
         """Extract repository name from Git URL."""
         # Handle URLs like https://github.com/user/repo.git

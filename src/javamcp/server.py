@@ -32,10 +32,12 @@ from javamcp.models.mcp_protocol import (AnalyzeClassRequest,
                                          ExtractApisResponse,
                                          GenerateGuideRequest,
                                          GenerateGuideResponse,
+                                         ProjectContextResponse,
                                          SearchMethodsRequest,
                                          SearchMethodsResponse)
 from javamcp.parser.java_parser import JavaSourceParser
 from javamcp.repository.manager import RepositoryManager
+from javamcp.resources.project_context_builder import ProjectContextBuilder
 
 # Create FastMCP server instance
 mcp = FastMCP(
@@ -405,3 +407,41 @@ def _extract_keywords(use_case: str) -> list[str]:
     }
     keywords = [w for w in words if w not in common_words and len(w) > 2]
     return keywords
+
+
+# Resource: Project Context
+@mcp.resource("javamcp://project/{repository_name}/context")
+def get_project_context(repository_name: str) -> str:
+    """
+    Get comprehensive project context for a Java API repository.
+
+    Provides detailed information including README, llms.txt, API statistics,
+    package summaries, top classes with Javadocs, and documentation coverage.
+
+    Args:
+        repository_name: Repository name (extracted from URL)
+
+    Returns:
+        JSON string with complete project context
+    """
+    if not _state.initialized:
+        return '{"error": "Server not initialized"}'
+
+    # Find repository by name
+    metadata = _state.repository_manager.get_repository_by_name(repository_name)
+
+    if not metadata:
+        return f'{{"error": "Repository not found: {repository_name}"}}'
+
+    # Build project context
+    context_builder = ProjectContextBuilder(
+        _state.repository_manager,
+        _state.indexer,
+        _state.query_engine,
+    )
+
+    context = context_builder.build_project_context(metadata.url)
+
+    # Return as formatted response
+    response = ProjectContextResponse(**context)
+    return response.model_dump_json(indent=2)

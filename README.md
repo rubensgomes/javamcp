@@ -5,6 +5,7 @@ A Python-based MCP (Model Context Protocol) server that provides AI coding assis
 ## Features
 
 - **4 MCP Tools** for comprehensive Java API exploration
+- **1 MCP Resource** for accessing comprehensive project context
 - **Rich Context** with Javadoc summaries and API documentation
 - **Git Repository Integration** for automatic code discovery
 - **ANTLR4-based Parser** for accurate Java 21+ source code analysis
@@ -151,6 +152,82 @@ Generate usage guides for specific use cases.
 - Relevant classes and methods
 - Javadoc-based usage examples
 - Formatted guide with context
+
+### MCP Resources
+
+JavaMCP provides 1 MCP resource for accessing project-level information:
+
+#### Project Context Resource (`javamcp://project/{repository_name}/context`)
+
+Access comprehensive contextual information about a Java API project.
+
+**URI Pattern:**
+```
+javamcp://project/{repository_name}/context
+```
+
+**Parameters:**
+- `repository_name`: Repository name (extracted from Git URL, e.g., "commons-lang" for "https://github.com/apache/commons-lang.git")
+
+**Response includes:**
+- **Repository Information**: Name and URL
+- **Project Description**: Generated overview with statistics
+- **README Content**: Full README.md file content (if available)
+- **LLMs.txt Content**: Context file for LLMs (if available)
+- **API Statistics**: Total classes, methods, packages, and averages
+- **Package Summaries**: Package-level information with class and method counts
+- **Top Classes**: Most significant classes with Javadocs
+- **Documentation Coverage**: Javadoc coverage metrics for classes and methods
+
+**Example Usage:**
+
+If you have indexed `https://github.com/apache/commons-lang.git`, access its context via:
+```
+javamcp://project/commons-lang/context
+```
+
+**Response Structure:**
+```json
+{
+  "repository_name": "commons-lang",
+  "repository_url": "https://github.com/apache/commons-lang.git",
+  "description": "# commons-lang\n\nRepository: https://github.com/apache/commons-lang.git...",
+  "readme_content": "# Apache Commons Lang...",
+  "llms_txt_content": null,
+  "statistics": {
+    "total_classes": 150,
+    "total_methods": 2500,
+    "total_packages": 15,
+    "average_methods_per_class": 16.67
+  },
+  "packages": [
+    {
+      "name": "org.apache.commons.lang3",
+      "class_count": 50,
+      "method_count": 800,
+      "classes": ["StringUtils", "ArrayUtils", "ObjectUtils", ...]
+    }
+  ],
+  "top_classes": [
+    {
+      "name": "StringUtils",
+      "fully_qualified_name": "org.apache.commons.lang3.StringUtils",
+      "package": "org.apache.commons.lang3",
+      "summary": "Operations on String that are null safe",
+      "method_count": 120,
+      "type": "class"
+    }
+  ],
+  "javadoc_coverage": {
+    "class_documentation_rate": 95.5,
+    "method_documentation_rate": 87.3,
+    "documented_classes": 143,
+    "total_classes": 150,
+    "documented_methods": 2183,
+    "total_methods": 2500
+  }
+}
+```
 
 ## Development
 

@@ -162,6 +162,35 @@ class GenerateGuideResponse(BaseModel):
     use_case: str = Field(..., description="Original use case")
 
 
+class ProjectContextResponse(BaseModel):
+    """
+    Response containing comprehensive project context and documentation.
+
+    Attributes:
+        repository_name: Repository name extracted from URL
+        repository_url: Full repository URL
+        description: Generated project description with overview
+        readme_content: README.md file content (if available)
+        llms_txt_content: llms.txt file content (if available)
+        statistics: API statistics (classes, methods, packages counts)
+        packages: Package-level summaries with class counts
+        top_classes: Top N most significant classes with Javadocs
+        javadoc_coverage: Javadoc documentation coverage metrics
+    """
+
+    repository_name: str = Field(..., description="Repository name")
+    repository_url: str = Field(..., description="Repository URL")
+    description: str = Field(..., description="Generated project description")
+    readme_content: Optional[str] = Field(None, description="README.md content")
+    llms_txt_content: Optional[str] = Field(None, description="llms.txt content")
+    statistics: dict = Field(..., description="API statistics")
+    packages: list[dict] = Field(default_factory=list, description="Package summaries")
+    top_classes: list[dict] = Field(
+        default_factory=list, description="Top classes with context"
+    )
+    javadoc_coverage: dict = Field(..., description="Documentation coverage metrics")
+
+
 class ErrorResponse(BaseModel):
     """
     Error response for MCP protocol.
