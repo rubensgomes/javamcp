@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.3] - 2025-10-11
+
+### Changed
+- **License Compliance**: Added Apache 2.0 license headers to all Python source files
+  - Added SPDX-License-Identifier to 68 Python files (all source and test files)
+  - Ensures clear licensing and copyright information throughout codebase
+  - Full Apache 2.0 license header with copyright notice in every file
+
+### Technical
+- All 249 tests passing
+- Code quality maintained: pylint 9.70/10
+- No functional changes or breaking changes
+- Fully backward compatible
+
 ## [0.2.2] - 2025-10-08
 
 ### Added
@@ -105,6 +119,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fast search and filtering capabilities
 - Context-aware responses for AI coding assistants
 
+[0.2.3]: https://github.com/rubensgomes/javamcp/releases/tag/v0.2.3
 [0.2.2]: https://github.com/rubensgomes/javamcp/releases/tag/v0.2.2
 [0.2.1]: https://github.com/rubensgomes/javamcp/releases/tag/v0.2.1
 [0.2.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.2.0
