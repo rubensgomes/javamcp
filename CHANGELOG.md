@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2025-10-12
+
+### Added
+- **Shallow Clone Support**: Optional `depth` parameter in `clone_repository()` function
+  - Default depth of 1 commit for all repository clones
+  - Reduces disk space usage significantly
+  - Improves clone performance for large repositories
+  - Maintains full API analysis functionality
+- **New Test Case**: `test_clone_repository_custom_depth` for custom depth validation
+
+### Changed
+- **`clone_repository()` function** in `src/javamcp/repository/git_operations.py:50`
+  - Added `depth: int = 1` parameter with default shallow clone
+  - Passes `depth` parameter to `Repo.clone_from()`
+  - Updated docstring with parameter documentation
+- **`_clone_new_repository()` method** in `src/javamcp/repository/manager.py:223`
+  - Now explicitly passes `depth=1` to ensure shallow clones
+- **Test suite**: Updated test mocks to verify `depth` parameter propagation
+
+### Technical
+- Performance optimization for repository cloning operations
+- Faster clone times for large Java repositories
+- Reduced local disk space requirements
+- No breaking changes - fully backward compatible
+- All tests passing
+
 ## [0.4.0] - 2025-10-11
 
 ### Added
@@ -180,6 +206,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fast search and filtering capabilities
 - Context-aware responses for AI coding assistants
 
+[0.5.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.5.0
 [0.4.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.4.0
 [0.3.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.3.0
 [0.2.3]: https://github.com/rubensgomes/javamcp/releases/tag/v0.2.3

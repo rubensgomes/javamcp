@@ -68,7 +68,7 @@ class TestCloneRepository:
 
         assert repo == mock_repo
         mock_repo_class.clone_from.assert_called_once_with(
-            "https://github.com/example/repo.git", "/tmp/repo", branch="main"
+            "https://github.com/example/repo.git", "/tmp/repo", branch="main", depth=1
         )
 
     @patch("javamcp.repository.git_operations.Repo")
@@ -82,7 +82,22 @@ class TestCloneRepository:
         )
 
         mock_repo_class.clone_from.assert_called_once_with(
-            "https://github.com/example/repo.git", "/tmp/repo", branch="develop"
+            "https://github.com/example/repo.git",
+            "/tmp/repo",
+            branch="develop",
+            depth=1,
+        )
+
+    @patch("javamcp.repository.git_operations.Repo")
+    def test_clone_repository_custom_depth(self, mock_repo_class):
+        """Test cloning with custom depth."""
+        mock_repo = MagicMock()
+        mock_repo_class.clone_from.return_value = mock_repo
+
+        clone_repository("https://github.com/example/repo.git", "/tmp/repo", depth=5)
+
+        mock_repo_class.clone_from.assert_called_once_with(
+            "https://github.com/example/repo.git", "/tmp/repo", branch="main", depth=5
         )
 
     @patch("javamcp.repository.git_operations.Repo")

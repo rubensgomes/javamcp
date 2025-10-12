@@ -220,7 +220,7 @@ class RepositoryManager:
 
     def _clone_new_repository(self, url: str, local_path: str) -> None:
         """Clone a new repository and track metadata."""
-        clone_repository(url, local_path)
+        clone_repository(url, local_path, depth=1)
 
         commit_hash = get_current_commit_hash(local_path)
         now = datetime.now()

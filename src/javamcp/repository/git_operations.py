@@ -47,7 +47,9 @@ from .exceptions import (CloneFailedError, GitOperationError,
                          InvalidRepositoryError)
 
 
-def clone_repository(url: str, local_path: str, branch: str = "main") -> Repo:
+def clone_repository(
+    url: str, local_path: str, branch: str = "main", depth: int = 1
+) -> Repo:
     """
     Clone a Git repository from URL to local path.
 
@@ -55,6 +57,7 @@ def clone_repository(url: str, local_path: str, branch: str = "main") -> Repo:
         url: Git repository URL
         local_path: Local filesystem path for cloning
         branch: Branch to checkout (default: "main")
+        depth: Depth of clone history (default: 1 for shallow clone)
 
     Returns:
         Repo instance
@@ -63,7 +66,7 @@ def clone_repository(url: str, local_path: str, branch: str = "main") -> Repo:
         CloneFailedError: If cloning fails
     """
     try:
-        repo = Repo.clone_from(url, local_path, branch=branch)
+        repo = Repo.clone_from(url, local_path, branch=branch, depth=depth)
         return repo
     except GitCommandError as e:
         raise CloneFailedError(f"Failed to clone repository {url}: {e}") from e
