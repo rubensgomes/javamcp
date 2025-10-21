@@ -71,15 +71,15 @@ tests/repository/test_git_operations.py::TestCloneRepository::test_clone_reposit
 - [x] Code implementation complete
 - [x] Tests written and passing
 - [x] Implementation plan documented
-- [ ] Update CHANGELOG.md with v0.5.0 entry
-- [ ] Run full test suite
-- [ ] Verify code quality (pylint, black, isort)
-- [ ] Update version in pyproject.toml (0.4.0 → 0.5.0)
-- [ ] Commit changes
-- [ ] Create git tag v0.5.0
-- [ ] Build distribution packages
-- [ ] Create GitHub release
-- [ ] Push to repository
+- [x] Update CHANGELOG.md with v0.5.0 entry
+- [x] Run full test suite
+- [x] Verify code quality (pylint, black, isort)
+- [x] Update version in pyproject.toml (0.4.0 → 0.5.0)
+- [x] Commit changes
+- [x] Create git tag v0.5.0
+- [x] Build distribution packages
+- [x] Create GitHub release
+- [x] Push to repository
 
 ## Pre-Release Checklist
 
@@ -197,4 +197,20 @@ clone_repository(url, path, depth=None)  # Full history
 
 ## Review
 
-Implementation completed and tested. Ready for CHANGELOG update, version bump, and release workflow execution.
+✅ **Release v0.5.0 completed successfully!**
+
+**Completed Tasks:**
+- CHANGELOG.md updated with v0.5.0 entry
+- All 263 tests passing
+- Code quality maintained (pylint 9.73/10, black, isort)
+- Version updated to 0.5.0 in pyproject.toml
+- Changes committed with release message
+- Git tag v0.5.0 created
+- Distribution packages built (tar.gz and wheel)
+- Pushed to repository (main branch and tag)
+- GitHub release created with artifacts
+
+**Release URL:** https://github.com/rubensgomes/javamcp/releases/tag/v0.5.0
+
+**Summary:**
+Release v0.5.0 adds shallow clone optimization with default depth of 1, significantly improving clone performance and reducing disk usage. All implementation, testing, and release processes completed successfully. Fully backward compatible with no breaking changes.

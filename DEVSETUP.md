@@ -5,8 +5,8 @@ This page contains information to set up the project development environment.
 ## Install required tools
 
 As per [PEP 668](https://peps.python.org/pep-0668/) starting with Python 3.12,
-non-brew-packaged Python package should only be installed in virtual
-environments.
+non-brew-packaged (macOS) Python package should only be installed in
+virtual environments.
 
 ```shell
 # macOS commands.
@@ -26,9 +26,9 @@ pipx install python-semantic-release
 
 ```shell
 # to add runtime dependencies to pyproject.toml (e.g., fastmcp):
-# poetry add fastmcp
+# poetry add <pkg name>
 # to add development dependencies to pyproject.toml (e.g., coverage):
-# poetry add --dev coverage
+# poetry add --dev <pkg name>
 ```
 
 ## Set up virtual environment
@@ -175,4 +175,3 @@ poetry run python -m semantic_release -vvv publish
     ```shell
     poetry env info
     ```
-

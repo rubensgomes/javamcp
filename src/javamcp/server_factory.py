@@ -36,22 +36,37 @@
 # FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT.
 
 """
-JavaMCP - MCP server for exposing Java APIs with Javadoc context.
+Factory module for creating FastMCP server with proper logging initialization.
 
-A Python-based MCP (Model Context Protocol) server that provides AI coding
-assistants with rich contextual information about Java APIs, including
-Javadocs, method signatures, class hierarchies, and usage examples.
+This module provides lazy initialization of the FastMCP server to ensure
+logging is configured before FastMCP library code executes.
 """
 
-__version__ = "0.6.0"
-__author__ = "JavaMCP Contributors"
+from fastmcp import FastMCP
 
-from javamcp.server import get_state, initialize_server
-from javamcp.server_factory import get_mcp_server
+# Global server instance (initialized lazily)
+_mcp_instance = None
 
-__all__ = [
-    "get_mcp_server",
-    "initialize_server",
-    "get_state",
-    "__version__",
-]
+
+def get_mcp_server() -> FastMCP:
+    """
+    Get or create the FastMCP server instance.
+
+    This function provides lazy initialization to ensure logging is
+    configured before FastMCP creates its loggers.
+
+    Returns:
+        FastMCP server instance
+    """
+    global _mcp_instance
+
+    if _mcp_instance is None:
+        _mcp_instance = FastMCP(
+            name="JavaMCP",
+            instructions="""
+              This MCP server exposes Java APIs for AI assistants. The Java APIs
+              are indexed from Java source code Git repositories.
+              """,
+        )
+
+    return _mcp_instance

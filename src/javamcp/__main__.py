@@ -47,7 +47,9 @@ from javamcp import __version__
 from javamcp.config.loader import load_config
 from javamcp.logging import (get_logger, log_server_shutdown,
                              log_server_startup, setup_logging)
-from javamcp.server import get_state, initialize_server, mcp
+from javamcp.server import (get_state, initialize_server,
+                            register_tools_and_resources)
+from javamcp.server_factory import get_mcp_server
 
 
 def setup_signal_handlers(logger) -> None:
@@ -123,9 +125,15 @@ def main() -> int:
         # Load configuration
         config = load_config(args.config)
 
-        # Setup logging
+        # Setup logging BEFORE creating FastMCP server instance
+        # This ensures FastMCP library uses the same logging configuration
         logger = setup_logging(config.logging)
         log_server_startup(logger, args.config)
+
+        # Register all MCP tools and resources (creates FastMCP instance)
+        logger.info("Registering MCP tools and resources...")
+        register_tools_and_resources()
+        logger.info("MCP tools and resources registered successfully")
 
         # Setup signal handlers for graceful shutdown
         setup_signal_handlers(logger)
@@ -136,14 +144,18 @@ def main() -> int:
         logger.info("Server initialized successfully")
         logger.info("Starting FastMCP server...")
 
+        # Get MCP server instance and start it
+        mcp = get_mcp_server()
+
         # Start FastMCP server - this handles stdio/http modes automatically
-        if config.mode == "stdio":
+        if config.server.mode == "stdio":
             logger.info("Running FastMCP in stdio mode.")
             mcp.run(log_level=config.logging.level.upper())
         else:
             logger.info("Running FastMCP in normal HTTP mode.")
             mcp.run(
                 transport="http",
+                host=config.server.host,
                 port=config.server.port,
                 log_level=config.logging.level.upper(),
             )

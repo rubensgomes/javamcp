@@ -52,31 +52,33 @@ def setup_logging(config: LoggingConfig) -> logging.Logger:
     """
     Configure logging based on application configuration.
 
+    This function configures both the application logger and the root logger
+    to ensure third-party libraries (like FastMCP) use the same logging settings.
+
     Args:
         config: LoggingConfig with level and file settings
 
     Returns:
         Configured logger instance
     """
-    logger = logging.getLogger("javamcp")
-    logger.setLevel(config.level.upper())
-
-    # Remove existing handlers
-    logger.handlers.clear()
-
     # Create formatter
     formatter = logging.Formatter(
         fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
     )
 
-    # Console handler (use stderr to avoid interfering with stdout in STDIO mode)
+    # Configure root logger to affect all libraries including FastMCP
+    root_logger = logging.getLogger()
+    root_logger.setLevel(config.level.upper())
+    root_logger.handlers.clear()
+
+    # Console handler for root logger (use stderr to avoid interfering with stdout)
     console_handler = logging.StreamHandler(sys.stderr)
     console_handler.setLevel(config.level.upper())
     console_handler.setFormatter(formatter)
-    logger.addHandler(console_handler)
+    root_logger.addHandler(console_handler)
 
-    # Rotating file handler if file path specified
+    # Rotating file handler for root logger if file path specified
     if config.file_path:
         file_path = Path(config.file_path)
         file_path.parent.mkdir(parents=True, exist_ok=True)
@@ -88,7 +90,14 @@ def setup_logging(config: LoggingConfig) -> logging.Logger:
         )
         file_handler.setLevel(config.level.upper())
         file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
+        root_logger.addHandler(file_handler)
+
+    # Get application-specific logger
+    logger = logging.getLogger("javamcp")
+    logger.setLevel(config.level.upper())
+
+    # Don't add handlers to application logger since root logger handles it
+    # This prevents duplicate log messages
 
     return logger
 

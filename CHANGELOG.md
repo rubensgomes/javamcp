@@ -5,6 +5,60 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2025-10-21
+
+### Fixed
+- **Logging Initialization Bug** (Critical Fix)
+  - FastMCP library now uses same logging configuration as application
+  - Implemented lazy initialization pattern via `server_factory.py`
+  - Root logger configured before any library code executes
+  - Eliminates duplicate log messages and inconsistent formatting
+  - Ensures consistent logging across all components
+
+### Added
+- **CLAUDE.md Documentation**
+  - Comprehensive guidance for future Claude Code instances
+  - Essential development commands (environment setup, testing, code quality, release process)
+  - Project structure tree with directory explanations
+  - Core architecture patterns and critical initialization order
+  - Global state management documentation
+  - Module responsibilities and data flow
+  - Key design patterns (Factory, Singleton, Visitor, Builder, Repository)
+  - MCP tools and resources overview
+  - Testing architecture (263 tests, 95%+ coverage)
+  - Common development patterns for adding tools, modifying parser, and configuration
+- **Server Factory Module** (`src/javamcp/server_factory.py`)
+  - Lazy FastMCP instance creation
+  - Singleton pattern for MCP server
+  - Ensures logging configured before library instantiation
+- **Tool Registration Function**
+  - `register_tools_and_resources()` for programmatic registration
+  - Replaces module-level decorators
+  - Called after logging setup
+
+### Changed
+- **Server Module Architecture**
+  - Removed module-level FastMCP instantiation
+  - Removed `@mcp.tool()` and `@mcp.resource()` decorators
+  - Tools and resources registered dynamically after logging configuration
+- **Main Entry Point Initialization**
+  - Logging setup occurs before server component imports
+  - Proper initialization order: config → logging → register tools → initialize server → run
+- **Logging Configuration**
+  - Root logger configured for centralized control
+  - All child loggers inherit settings automatically
+  - No duplicate handlers or log messages
+
+### Removed
+- **`.mcp.json`**: Removed obsolete MCP configuration file
+
+### Technical
+- All 263 tests passing
+- Code quality maintained (pylint, black, isort)
+- Fully backward compatible
+- No breaking changes to public API
+- Critical initialization order documented in CLAUDE.md
+
 ## [0.5.0] - 2025-10-12
 
 ### Added
@@ -206,6 +260,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fast search and filtering capabilities
 - Context-aware responses for AI coding assistants
 
+[0.6.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.6.0
 [0.5.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.5.0
 [0.4.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.4.0
 [0.3.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.3.0

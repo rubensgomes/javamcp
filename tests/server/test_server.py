@@ -49,7 +49,8 @@ from javamcp.indexer.indexer import APIIndexer
 from javamcp.indexer.query_engine import QueryEngine
 from javamcp.models.java_entities import JavaClass
 from javamcp.repository.manager import RepositoryManager
-from javamcp.server import get_state, initialize_server, mcp
+from javamcp.server import get_state, initialize_server
+from javamcp.server_factory import get_mcp_server
 
 
 class TestFastMCPServer:
@@ -123,6 +124,7 @@ class TestFastMCPServer:
 
     def test_mcp_instance_exists(self):
         """Test that FastMCP instance is created."""
+        mcp = get_mcp_server()
         assert mcp is not None
         # Check that tools are registered
         # Note: FastMCP doesn't expose tools directly, so we just verify instance exists
@@ -195,7 +197,6 @@ class TestFastMCPResources:
         from javamcp.server import get_project_context
 
         assert get_project_context is not None
-        # FastMCP wraps resources in FunctionResourceTemplate
-        assert hasattr(get_project_context, "name") or hasattr(
-            get_project_context, "uri_template"
-        )
+        # Function is not decorated at module level anymore due to lazy initialization
+        # Just verify it's callable
+        assert callable(get_project_context)

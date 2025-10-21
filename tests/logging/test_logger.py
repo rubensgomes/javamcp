@@ -65,10 +65,12 @@ class TestSetupLogging:
 
         assert logger.name == "javamcp"
         assert logger.level == logging.INFO
-        assert len(logger.handlers) == 1
-        assert isinstance(logger.handlers[0], logging.StreamHandler)
+        # Handlers are now on root logger to affect FastMCP library
+        root_logger = logging.getLogger()
+        assert len(root_logger.handlers) == 1
+        assert isinstance(root_logger.handlers[0], logging.StreamHandler)
         # Verify console handler uses stderr (not stdout) to avoid interfering with STDIO mode
-        assert logger.handlers[0].stream == sys.stderr
+        assert root_logger.handlers[0].stream == sys.stderr
 
     def test_setup_logging_with_file(self, tmp_path):
         """Test logging setup with file output."""
@@ -78,8 +80,10 @@ class TestSetupLogging:
         logger = setup_logging(config)
 
         assert logger.level == logging.DEBUG
-        assert len(logger.handlers) == 2
-        handler_types = [type(h).__name__ for h in logger.handlers]
+        # Handlers are now on root logger
+        root_logger = logging.getLogger()
+        assert len(root_logger.handlers) == 2
+        handler_types = [type(h).__name__ for h in root_logger.handlers]
         assert "StreamHandler" in handler_types
         assert "RotatingFileHandler" in handler_types
 
@@ -91,7 +95,9 @@ class TestSetupLogging:
         logger = setup_logging(config)
 
         assert log_file.parent.exists()
-        assert len(logger.handlers) == 2
+        # Handlers are now on root logger
+        root_logger = logging.getLogger()
+        assert len(root_logger.handlers) == 2
 
     def test_setup_logging_different_levels(self):
         """Test logging setup with different log levels."""
@@ -115,8 +121,10 @@ class TestSetupLogging:
         logger1 = setup_logging(config)
         logger2 = setup_logging(config)
 
-        # Should have same number of handlers, not doubled
-        assert len(logger1.handlers) == len(logger2.handlers)
+        # Handlers are on root logger now, should have same number of handlers, not doubled
+        root_logger = logging.getLogger()
+        # Check that handlers weren't doubled
+        assert len(root_logger.handlers) == 1
 
     def test_setup_logging_rotation_config(self, tmp_path):
         """Test logging setup with custom rotation configuration."""
@@ -130,9 +138,10 @@ class TestSetupLogging:
 
         logger = setup_logging(config)
 
-        # Find the RotatingFileHandler
+        # Find the RotatingFileHandler on root logger
+        root_logger = logging.getLogger()
         rotating_handler = None
-        for handler in logger.handlers:
+        for handler in root_logger.handlers:
             if isinstance(handler, RotatingFileHandler):
                 rotating_handler = handler
                 break

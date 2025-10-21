@@ -236,8 +236,7 @@ javamcp://project/commons-lang/context
             "classes": [
                 "StringUtils",
                 "ArrayUtils",
-                "ObjectUtils",
-                ...
+                "ObjectUtils"
             ]
         }
     ],
@@ -315,6 +314,33 @@ javamcp/
 - **95%+ average coverage** for production code
 - Comprehensive unit and integration tests
 
+## Claude Code Commands
+
+- Update `Claude Code` to the latest version:
+
+    ```bash
+    claude update
+    ```
+
+- List configure MCP servers:
+
+    ```bash
+    claude mcp list
+    ```
+
+- See `Claude Code` version:
+
+    ```bash
+    claude --version
+    ```
+
+- Start `Claude Code` in IDE mode:
+
+    ```bash
+    claude --verbose --debug ide
+    ```
+
+
 ## Contributing
 
 Contributions are welcome! Please ensure:
@@ -324,6 +350,6 @@ Contributions are welcome! Please ensure:
 - Code follows Black formatting
 - Type hints are included
 
-## License
 
-[Apache Version 2.0 License](LICENSE)
+---
+Author:  [Rubens Gomes](https://rubensgomes.com/)

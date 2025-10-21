@@ -37,11 +37,12 @@
 
 """
 FastMCP server for exposing Java APIs to AI assistants.
+
+This module uses lazy initialization via server_factory to ensure logging
+is configured before FastMCP instantiation.
 """
 
 from typing import Optional
-
-from fastmcp import FastMCP
 
 from javamcp.config.loader import load_config
 from javamcp.config.schema import ApplicationConfig, RepositoryConfig
@@ -60,15 +61,7 @@ from javamcp.models.mcp_protocol import (AnalyzeClassRequest,
 from javamcp.parser.java_parser import JavaSourceParser
 from javamcp.repository.manager import RepositoryManager
 from javamcp.resources.project_context_builder import ProjectContextBuilder
-
-# Create FastMCP server instance
-mcp = FastMCP(
-    name="JavaMCP",
-    instructions="""
-              This MCP server exposes Java APIs for AI assistants. The Java APIs
-              are indexed from Java source code Git repositories.
-              """,
-)
+from javamcp.server_factory import get_mcp_server
 
 
 # Global state for shared components
@@ -108,8 +101,26 @@ def get_state() -> ServerState:
     return _state
 
 
+def register_tools_and_resources() -> None:
+    """
+    Register all MCP tools and resources with the FastMCP server.
+
+    This function must be called after logging is configured to ensure
+    the FastMCP instance is created with proper logging settings.
+    """
+    mcp = get_mcp_server()
+
+    # Register tools
+    mcp.tool()(search_methods)
+    mcp.tool()(analyze_class)
+    mcp.tool()(extract_apis)
+    mcp.tool()(generate_guide)
+
+    # Register resources
+    mcp.resource("javamcp://project/{repository_name}/context")(get_project_context)
+
+
 # Tool: Search Methods
-@mcp.tool()
 def search_methods(
     method_name: str,
     class_name: Optional[str] = None,
@@ -167,7 +178,6 @@ def search_methods(
 
 
 # Tool: Analyze Class
-@mcp.tool()
 def analyze_class(
     fully_qualified_name: str,
     repository_name: Optional[str] = None,
@@ -224,7 +234,6 @@ def analyze_class(
 
 
 # Tool: Extract APIs
-@mcp.tool()
 def extract_apis(
     repository_url: str,
     branch: str = "main",
@@ -322,7 +331,6 @@ def extract_apis(
 
 
 # Tool: Generate Guide
-@mcp.tool()
 def generate_guide(
     use_case: str,
     repository_filter: Optional[str] = None,
@@ -432,7 +440,6 @@ def _extract_keywords(use_case: str) -> list[str]:
 
 
 # Resource: Project Context
-@mcp.resource("javamcp://project/{repository_name}/context")
 def get_project_context(repository_name: str) -> str:
     """
     Get comprehensive project context for a Java API repository.
