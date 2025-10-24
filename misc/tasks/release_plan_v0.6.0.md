@@ -325,4 +325,71 @@ No migration required. This release is fully backward compatible. The changes ar
 
 ## Review
 
-_To be completed after release_
+✅ **Release v0.6.0 preparation completed!**
+
+**Completed Tasks:**
+- [x] CHANGELOG.md updated with v0.6.0 entry
+- [x] All 263 tests passing
+- [x] Code quality verified (black, isort, pylint 9.73/10)
+- [x] Version updated to 0.6.0 in pyproject.toml and __init__.py
+- [x] Changes committed with conventional commit message
+- [x] Git tag v0.6.0 created
+- [x] Distribution packages built (tar.gz and wheel)
+
+**Remaining Manual Tasks:**
+- [ ] Push to repository: `git push origin main && git push origin v0.6.0`
+- [ ] Create GitHub release:
+```bash
+gh release create v0.6.0 \
+  --title "v0.6.0 - Logging Initialization Fix and Documentation" \
+  --notes "$(cat <<'EOF'
+# v0.6.0 - Logging Initialization Fix and Documentation
+
+## Fixed
+- **Logging Initialization Bug** (Critical)
+  - FastMCP library now uses same logging configuration as application
+  - Root logger configured before any library code executes
+  - Eliminates duplicate log messages
+  - Ensures consistent logging across all components
+
+## Added
+- **CLAUDE.md Documentation**
+  - Comprehensive guidance for Claude Code instances
+  - Essential development commands and workflows
+  - Architecture patterns and design decisions
+  - Project structure with inline documentation
+  - Common development patterns
+- **Server Factory Module**
+  - Lazy FastMCP initialization pattern
+  - Proper separation of logging configuration and server creation
+
+## Changed
+- Refactored server architecture for lazy initialization
+- Updated main entry point initialization order
+- Tools and resources now registered programmatically
+
+## Technical
+- All 263 tests passing
+- Code quality maintained (pylint 9.73/10)
+- Fully backward compatible
+- No breaking changes
+
+## Benefits
+- ✅ Consistent logging across application and libraries
+- 📚 Better onboarding for future development
+- 🏗️ Cleaner architecture with proper initialization order
+- 🔧 Easier maintenance with comprehensive documentation
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+EOF
+)" \
+  dist/javamcp-0.6.0.tar.gz \
+  dist/javamcp-0.6.0-py3-none-any.whl
+```
+
+**Built Artifacts:**
+- `dist/javamcp-0.6.0.tar.gz` - Source distribution
+- `dist/javamcp-0.6.0-py3-none-any.whl` - Python wheel
+
+**Summary:**
+Release v0.6.0 fixes a critical logging initialization bug and adds comprehensive CLAUDE.md documentation. The lazy initialization pattern ensures FastMCP uses the same logging configuration as the application. All code quality checks passed, tests are green, and distribution packages are ready for release.

@@ -1,6 +1,6 @@
 # Development Environment Setup
 
-This page contains information to set up the project development environment.
+This page contains information to set up the development environment.
 
 ## Install required tools
 
@@ -8,91 +8,110 @@ As per [PEP 668](https://peps.python.org/pep-0668/) starting with Python 3.12,
 non-brew-packaged (macOS) Python package should only be installed in
 virtual environments.
 
-```shell
-# macOS commands.
-brew install python3
-brew install pipx
-# Generic commands
-pip install antlr4-python3-runtime
-pipx ensurepath
-pipx install fastmcp
-pipx install pylint
-pipx install pytest
-pipx install poetry
-pipx install python-semantic-release
-```
-
-## Add `poetry` dependencies
-
-```shell
-# to add runtime dependencies to pyproject.toml (e.g., fastmcp):
-# poetry add <pkg name>
-# to add development dependencies to pyproject.toml (e.g., coverage):
-# poetry add --dev <pkg name>
-```
-
-## Set up virtual environment
-
-```shell
-# Create virtual environment under <project>/.venv
-poetry config virtualenvs.in-project true
-poetry update -vv
-poetry lock --regenerate -vv
-# poetry automatically uses the existing virtual environment to install packages
-poetry install
-# display information about virtual environment 
-poetry env info
-poetry show
-```
-
-## Open a shell within virtual environment using `poetry`:
-
-```shell
-# Ensure at the top of the project root folder
-# NOTE: this assumes you have cloned this project from a Git repo
-cd $(git rev-parse --show-toplevel) || exit
-# poetry shell
-poetry env activate
-```
-
-## Linting and Unit Testing
-
-   ```shell
-   PACKAGE="javamcp"
-   cd $(git rev-parse --show-toplevel) || exit
-   poetry run pylint "${PACKAGE}" || {
-     printf "failed pylint.\n" >&2
-     sleep 120
-     exit 1
-   }
-
-   # run pytest with coverage
-   poetry run python -m coverage run -m pytest tests/ || {
-     printf "failed unit testing.\n" >&2
-     sleep 10
-     exit 1
-   }
-
-   # generate coverage report
-   poetry run python -m coverage report -m
-   ```
-
-## Clean shell environment
-
-- To complete clean any files and folders from this project untracked by git,
-  including venv (virtual enviroment) run:
+- Commands to be used on a macOS (UNIX) machine:
 
     ```shell
-    git clean -fXd
+    # macOS commands.
+    brew install python3
+    brew install pipx
+    # Generic commands
+    pip install antlr4-python3-runtime
+    pipx ensurepath
+    pipx install fastmcp
+    pipx install pylint
+    pipx install pytest
+    pipx install poetry
+    pipx install python-semantic-release
     ```
 
-- To remove only the virtual environment delete the `.venv` folder:
+## `poetry` dependencies
+
+- Sample code to add dependencies to the `pyproject.toml`:
+
+    ```shell
+    # to add runtime dependencies to pyproject.toml (e.g., fastmcp):
+    # poetry add <pkg name>
+    # to add development dependencies to pyproject.toml (e.g., coverage):
+    # poetry add --dev <pkg name>
+    ```
+
+- Command to upgrade the packages in the `pyproject.toml`:
 
     ```shell
     # Ensure at the top of the project root folder
     # NOTE: this assumes you have cloned this project from a Git repo
     cd $(git rev-parse --show-toplevel) || exit
+    poetry update -vv
+    poetry lock --regenerate -vv
+    ```
+
+## Python Virtual Environment
+
+- Configure a local project virtual environment:
+
+    ```shell
+    # Ensure at the top of the project root folder
+    # NOTE: this assumes you have cloned this project from a Git repo
+    cd $(git rev-parse --show-toplevel) || exit
+    # Create virtual environment under <project>/.venv
+    poetry config virtualenvs.in-project true
+    # poetry automatically uses the existing virtual environment to install packages
+    poetry install
+    # display information about virtual environment 
+    poetry env info
+    poetry show
+    ```
+
+- Activate the virtual environment:
+
+    ```shell
+    # Ensure at the top of the project root folder
+    # NOTE: this assumes you have cloned this project from a Git repo
+    cd $(git rev-parse --show-toplevel) || exit
+    eval $(poetry env activate)
+    poetry env activate
+    ```
+
+- To remove the virtual environment delete the `.venv` folder:
+
+    ```shell
+    # Ensure at the top of the project root folder
+    # NOTE: this assumes you have cloned this project from a Git repo
+    cd $(git rev-parse --show-toplevel) || exit
+    poetry env remove --all
     rm -fr .venv/
+    ```
+
+## Linting and Unit Testing
+
+- Linting the project source code:
+
+    ```shell
+    cd $(git rev-parse --show-toplevel) || exit
+    poetry run pylint "src" || {
+     printf "failed pylint.\n" >&2
+     sleep 120
+     exit 1
+    }
+    ```
+
+- Unit testing the project:
+
+    ```shell
+    cd $(git rev-parse --show-toplevel) || exit
+    # run pytest with coverage
+    poetry run python -m coverage run -m pytest tests/ || {
+     printf "failed unit testing.\n" >&2
+     sleep 10
+     exit 1
+    }
+    ```
+
+- Generate coverage report:
+
+    ```shell
+    cd $(git rev-parse --show-toplevel) || exit
+    poetry run python -m coverage report -m
     ```
 
 ## Release process
@@ -101,55 +120,16 @@ poetry env activate
 
 A GH_TOKEN environment variable is required to create releases on GitHub.
 
-### Git commit messages
+### Generating a release plan
 
-Due to the project release process, the `git commit` messages should follow the
-below conventional commits format for commit messages:
+The release plan is generated/executed within `Claude Code`. You must 
+start `Claude Code`, and run the following custom slash command:
 
-- chore: Update dependencies
-- fix: commits → patch version bump (0.1.0 → 0.1.1)
-- feat: commits → minor version bump (0.1.0 → 0.2.0)
-- BREAKING CHANGE: → major version bump (0.1.0 → 1.0.0)
+- Claude code custom slash command:
 
-```shell
-git commit -m "feat: add new feature" -a
-git push
-```
-
-```shell
-git commit -m "fix: fixed bug" -a
-git push
-```
-
-```shell
-git commit -m "chore: setting up release" -a
-git push
-```
-
-```shell
-git commit -m "docs: update documentation" -a
-git push
-```
-
-### Running the release
-
-- Create an initial git tag:
-
-```shell
-git tag v0.1.0
-git push origin v0.1.0
-# Create a release for the existing tag
-gh release create v0.1.0 --title "v0.1.0" --notes "Initial release"
-```
-
-```shell
-# Ensure at the top of the project root folder
-# NOTE: this assumes you have cloned this project from a Git repo
-cd $(git rev-parse --show-toplevel) || exit
-poetry build
-poetry run python -m semantic_release -vvv version
-poetry run python -m semantic_release -vvv publish
-```
+    ```text
+    /release-plan
+    ```
 
 ## PyCharm IDE Development Environment
 

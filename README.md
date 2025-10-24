@@ -1,12 +1,14 @@
 # JavaMCP
 
-A Python-based MCP (Model Context Protocol) server that provides AI coding
-assistants with rich contextual information about Java APIs, including Javadocs,
-method signatures, class hierarchies, and usage examples.
+A Python-based AI MCP (Model Context Protocol) server that provides AI coding
+assistant agents with rich contextual information about Java APIs found in 
+Java source code files stored in configured Git repositories. The information 
+gathered from the Java source code files include Javadocs, public method 
+signatures, class hierarchies, and usage examples.
 
 ## AI General Disclaimer
 
-fOR **AI-GENERATED CONTENT**, please refer to the AI-GENERATED CONTENT
+For **AI-GENERATED CONTENT**, please refer to the AI-GENERATED CONTENT
 [DISCLAIMER](DISCLAIMER.md)
 
 ## Features
@@ -24,14 +26,16 @@ fOR **AI-GENERATED CONTENT**, please refer to the AI-GENERATED CONTENT
 ### Prerequisites
 
 - Python 3.13+
-- Poetry (for dependency management)
+- Poetry (for dependency management and installation)
 - ANTLR4 Java Grammars
 
-### Setup
+Refer to [DEVSETUP.md](./DEVSETUP.md) for further setup instructions. 
+
+### Development Setup
 
 1. **Clone the repository:**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/rubensgomes/javamcp
    cd javamcp
    ```
 
@@ -340,7 +344,6 @@ javamcp/
     claude --verbose --debug ide
     ```
 
-
 ## Contributing
 
 Contributions are welcome! Please ensure:
@@ -349,7 +352,6 @@ Contributions are welcome! Please ensure:
 - Code coverage remains above 80%
 - Code follows Black formatting
 - Type hints are included
-
 
 ---
 Author:  [Rubens Gomes](https://rubensgomes.com/)

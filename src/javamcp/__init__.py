@@ -43,7 +43,7 @@ assistants with rich contextual information about Java APIs, including
 Javadocs, method signatures, class hierarchies, and usage examples.
 """
 
-__version__ = "0.6.0"
+__version__ = "0.7.0"
 __author__ = "JavaMCP Contributors"
 
 from javamcp.server import get_state, initialize_server

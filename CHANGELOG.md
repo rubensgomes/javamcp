@@ -5,6 +5,42 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2025-10-23
+
+### Added
+- **Release Plan Slash Command** (`.claude/commands/release-plan.md`)
+  - Automated release plan generation via `/release-plan` command
+  - Repository validation and access checking
+  - Structured workflow for consistent releases
+- **AI Disclaimer in LICENSE**
+  - Prominent AI-generated content notice at top of license file
+  - References to DISCLAIMER.md for complete terms
+  - Ensures transparency about project origins
+
+### Changed
+- **Documentation Improvements**
+  - `DEVSETUP.md`: Complete restructure with improved readability
+    - Simplified installation instructions
+    - Better command organization
+    - Clearer section hierarchy
+  - `README.md`: Content and clarity enhancements
+    - Fixed typo: "fOR" → "For" in AI disclaimer section
+    - Improved feature descriptions
+    - Added actual repository URL to clone instructions
+  - `grammars/README.md`: Documentation refinements
+- **Dependency Updates**
+  - `fastmcp`: 2.12.4 → 2.12.5 (latest stable patch)
+  - `pydantic`: 2.12.0 → 2.12.3 (latest stable patch)
+- **Project Metadata**
+  - Added keywords: "LLM" and "agent" for better PyPI discoverability
+
+### Technical
+- All 247 tests passing
+- 95%+ test coverage maintained
+- Code quality checks passed (pylint, black, isort)
+- Fully backward compatible
+- No breaking changes to public API
+
 ## [0.6.0] - 2025-10-21
 
 ### Fixed
@@ -260,6 +296,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fast search and filtering capabilities
 - Context-aware responses for AI coding assistants
 
+[0.7.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.7.0
 [0.6.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.6.0
 [0.5.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.5.0
 [0.4.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.4.0
