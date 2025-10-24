@@ -8,13 +8,26 @@ As per [PEP 668](https://peps.python.org/pep-0668/) starting with Python 3.12,
 non-brew-packaged (macOS) Python package should only be installed in
 virtual environments.
 
-- Commands to be used on a macOS (UNIX) machine:
+- Install python3 and pipx (macOS):
 
     ```shell
     # macOS commands.
     brew install python3
     brew install pipx
-    # Generic commands
+    ```
+
+- Install python3 and pipx (Linux Ubuntu):
+
+    ```shell
+    # Ubuntu Linux commands.
+    sudo apt update
+    sudo apt install python3
+    sudo apt install pipx
+    ```
+
+- Install several utilities:
+
+    ```shell
     pip install antlr4-python3-runtime
     pipx ensurepath
     pipx install fastmcp
@@ -24,15 +37,28 @@ virtual environments.
     pipx install python-semantic-release
     ```
 
+- Upgrade above packages installed using `pipx`:
+
+    ```shell
+    pipx upgrade fastmcp
+    pipx upgrade pylint
+    pipx upgrade pytest
+    pipx upgrade poetry
+    ```
+
+
 ## `poetry` dependencies
 
 - Sample code to add dependencies to the `pyproject.toml`:
 
     ```shell
+    # Ensure at the top of the project root folder
+    # NOTE: this assumes you have cloned this project from a Git repo
+    cd $(git rev-parse --show-toplevel) || exit
     # to add runtime dependencies to pyproject.toml (e.g., fastmcp):
-    # poetry add <pkg name>
+    poetry add fastmcp
     # to add development dependencies to pyproject.toml (e.g., coverage):
-    # poetry add --dev <pkg name>
+    poetry add --dev coverage
     ```
 
 - Command to upgrade the packages in the `pyproject.toml`:
@@ -72,7 +98,7 @@ virtual environments.
     poetry env activate
     ```
 
-- To remove the virtual environment delete the `.venv` folder:
+- To remove the virtual environment:
 
     ```shell
     # Ensure at the top of the project root folder
@@ -87,6 +113,8 @@ virtual environments.
 - Linting the project source code:
 
     ```shell
+    # Ensure at the top of the project root folder
+    # NOTE: this assumes you have cloned this project from a Git repo
     cd $(git rev-parse --show-toplevel) || exit
     poetry run pylint "src" || {
      printf "failed pylint.\n" >&2
@@ -98,6 +126,8 @@ virtual environments.
 - Unit testing the project:
 
     ```shell
+    # Ensure at the top of the project root folder
+    # NOTE: this assumes you have cloned this project from a Git repo
     cd $(git rev-parse --show-toplevel) || exit
     # run pytest with coverage
     poetry run python -m coverage run -m pytest tests/ || {
@@ -110,15 +140,36 @@ virtual environments.
 - Generate coverage report:
 
     ```shell
+    # Ensure at the top of the project root folder
+    # NOTE: this assumes you have cloned this project from a Git repo
     cd $(git rev-parse --show-toplevel) || exit
     poetry run python -m coverage report -m
     ```
 
 ## Release process
 
-### GH_TOKEN environment variable
+### Prerequisites
 
-A GH_TOKEN environment variable is required to create releases on GitHub.
+Ensure the following tools are installed:
+
+- gh version 2.81.0 or later (GitHub CLI tool)
+- git version 2.43.0 or later
+
+### Environment Variables
+
+The release process is done on a Linux machine using a "Claude Code" custom 
+slash command `.claude/commands/release-plan.md`.  Therefore, it is expected 
+that a `Claude Code` CLI session is started running on an underlying Linux 
+`bash` shell with the following environment variables set:
+
+**Currently, only Rubens Gomes is able to push a release**
+
+- GIT_AUTHOR_NAME
+- GIT_AUTHOR_EMAIL
+- GIT_COMMITTER_EMAIL
+- GITHUB_USER
+- GITHUB_TOKEN
+- GH_TOKEN (should be same as GITHUB_TOKEN)
 
 ### Generating a release plan
 
@@ -130,6 +181,9 @@ start `Claude Code`, and run the following custom slash command:
     ```text
     /release-plan
     ```
+
+- Then once the plan is reviewed and approved, you prompt `Claude Code` to 
+  proceed with the plan.
 
 ## PyCharm IDE Development Environment
 

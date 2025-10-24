@@ -5,6 +5,55 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] - 2025-10-24
+
+### Added
+- **Multi-Platform Setup Instructions** (`DEVSETUP.md`)
+  - Linux Ubuntu installation commands for python3 and pipx
+  - Separated installation steps for macOS and Linux
+  - Platform-specific guidance for developers on different operating systems
+- **Package Upgrade Instructions** (`DEVSETUP.md`)
+  - Commands for upgrading pipx-installed packages (fastmcp, pylint, pytest, poetry)
+  - Helps developers maintain up-to-date tooling
+- **Production Readiness Warning** (`README.md`)
+  - Prominent WARNING section stating project is under development
+  - Sets clear expectations about alpha status as of Oct. 24, 2025
+- **Enhanced Command Examples** (`DEVSETUP.md`)
+  - Explicit examples (e.g., `poetry add fastmcp`) instead of generic placeholders
+  - Consistent `cd $(git rev-parse --show-toplevel) || exit` pattern
+  - "Ensure at project root" reminders before command sequences
+
+### Changed
+- **LICENSE File - AI Disclaimer Formatting**
+  - Reformatted with visual warning box: `!!! WARNING / ATTENTION !!!`
+  - Multi-line formatting for better readability
+  - More prominent treatment of critical AI disclaimer
+  - Clearer emphasis on DISCLAIMER.md requirement
+- **README.md Improvements**
+  - Improved project description formatting with better line breaks
+  - Added context about project intent and use case
+  - Fixed trailing whitespace throughout
+  - Removed premature "Contributing" section (project still in alpha)
+- **DEVSETUP.md Enhancements**
+  - Better organized with platform-specific section headers
+  - Added explicit comments in code examples
+  - Improved virtual environment management instructions
+  - Consistent command patterns with error handling
+
+### Removed
+- **Contributing Section** (`README.md`)
+  - Removed as project is in alpha/development phase
+  - Can be re-added when project reaches stable release
+
+### Technical
+- No code changes
+- No dependency updates
+- All 247 tests passing
+- 95%+ test coverage maintained
+- Code quality maintained (pylint, black, isort)
+- Fully backward compatible
+- No breaking changes to public API
+
 ## [0.7.0] - 2025-10-23
 
 ### Added
@@ -296,6 +345,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fast search and filtering capabilities
 - Context-aware responses for AI coding assistants
 
+[0.8.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.8.0
 [0.7.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.7.0
 [0.6.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.6.0
 [0.5.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.5.0
