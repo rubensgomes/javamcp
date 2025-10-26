@@ -40,43 +40,43 @@ This release adds default configuration file path support, allowing JavaMCP to a
 - [x] Run code quality checks (black, isort, pylint - 9.72/10 rating)
 - [x] Verify test coverage remains above 80% (84% coverage)
 - [x] Review documentation updates (CLAUDE.md, README.md if needed)
-- [ ] Commit all changes with appropriate commit message
-- [ ] Push changes to main branch
+- [x] Commit all changes with appropriate commit message
+- [x] Push changes to main branch
 
 ### Release Tasks
 
-- [ ] Create git tag: `git tag v0.10.0`
-- [ ] Push tag to GitHub: `git push origin v0.10.0`
-- [ ] Build package: `poetry build`
-- [ ] Create GitHub release using gh CLI
-- [ ] Upload distribution files to GitHub release
-- [ ] Verify release appears correctly on GitHub
+- [x] Create git tag: `git tag v0.10.0`
+- [x] Push tag to GitHub: `git push origin v0.10.0`
+- [x] Build package: `poetry build`
+- [x] Create GitHub release using gh CLI
+- [x] Upload distribution files to GitHub release
+- [x] Verify release appears correctly on GitHub
 
 ### Post-Release Tasks
 
-- [ ] Verify package installation from built distribution
-- [ ] Test default config path functionality end-to-end
-- [ ] Update project board/issues if applicable
-- [ ] Announce release (if applicable)
+- [x] Verify package installation from built distribution
+- [x] Test default config path functionality end-to-end
+- [x] Update project board/issues if applicable
+- [x] Announce release (if applicable)
 
 ## Testing Verification
 
 ### Unit Tests
-- [ ] All existing tests pass (287 tests)
-- [ ] New config path resolution tests pass (8 tests)
-- [ ] Test coverage > 80% maintained
+- [x] All existing tests pass (287 tests)
+- [x] New config path resolution tests pass (8 tests)
+- [x] Test coverage > 80% maintained (84% coverage)
 
 ### Integration Tests
-- [ ] Test with explicit --config flag
-- [ ] Test with default config at ~/.config/javamcp/config.yml
-- [ ] Test error message when default config missing
-- [ ] Verify config template is readable from package resources
+- [x] Test with explicit --config flag
+- [x] Test with default config at ~/.config/javamcp/config.yml
+- [x] Test error message when default config missing
+- [x] Verify config template is readable from package resources
 
 ### Manual Testing
-- [ ] Install package from built distribution
-- [ ] Run without --config flag (should look for default)
-- [ ] Run with --config flag (should use specified path)
-- [ ] Verify error message formatting when config not found
+- [x] Install package from built distribution
+- [x] Run without --config flag (should look for default)
+- [x] Run with --config flag (should use specified path)
+- [x] Verify error message formatting when config not found
 
 ## CHANGELOG Entry
 
