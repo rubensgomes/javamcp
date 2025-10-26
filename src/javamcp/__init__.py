@@ -43,7 +43,15 @@ assistants with rich contextual information about Java APIs, including
 Javadocs, method signatures, class hierarchies, and usage examples.
 """
 
-__version__ = "0.7.0"
+from importlib.metadata import PackageNotFoundError, version
+
+# Read version from package metadata (pyproject.toml)
+try:
+    __version__ = version("javamcp")
+except PackageNotFoundError:
+    # Fallback for development/uninstalled package
+    __version__ = "unknown"
+
 __author__ = "JavaMCP Contributors"
 
 from javamcp.server import get_state, initialize_server

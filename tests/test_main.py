@@ -39,12 +39,17 @@
 Unit tests for __main__ module.
 """
 
+import re
 import signal
-from unittest.mock import MagicMock, patch
+from pathlib import Path
+from unittest.mock import MagicMock, mock_open, patch
 
 import pytest
 
-from javamcp.__main__ import setup_signal_handlers
+from javamcp import __version__
+from javamcp.__main__ import (display_config_error_and_exit,
+                              get_config_template, get_default_config_path,
+                              resolve_config_path, setup_signal_handlers)
 
 
 class TestSignalHandlers:
@@ -150,3 +155,133 @@ class TestSignalHandlers:
             assert mock_state.initialized is False
             mock_shutdown.assert_called_once()
             mock_exit.assert_called_once_with(0)
+
+
+class TestConfigPathResolution:
+    """Tests for configuration path resolution functions."""
+
+    def test_get_default_config_path(self):
+        """Test that default config path is constructed correctly."""
+        expected_path = Path.home() / ".config" / "javamcp" / "config.yml"
+        assert get_default_config_path() == expected_path
+
+    @patch("javamcp.__main__.files")
+    def test_get_config_template_success(self, mock_files):
+        """Test successful reading of config template."""
+        mock_template = MagicMock()
+        mock_template.read_text.return_value = "sample: config\n"
+        mock_files.return_value.joinpath.return_value = mock_template
+
+        result = get_config_template()
+
+        assert result == "sample: config\n"
+        mock_files.assert_called_once_with("javamcp")
+        mock_files.return_value.joinpath.assert_called_once_with("config_template.yml")
+
+    @patch("javamcp.__main__.files")
+    def test_get_config_template_failure(self, mock_files):
+        """Test that RuntimeError is raised when template cannot be read."""
+        mock_files.return_value.joinpath.side_effect = Exception("File not found")
+
+        with pytest.raises(RuntimeError, match="Failed to read configuration template"):
+            get_config_template()
+
+    def test_resolve_config_path_with_explicit_path(self):
+        """Test that explicit config path is returned unchanged."""
+        config_path = "/custom/path/config.yml"
+        result = resolve_config_path(config_path)
+        assert result == config_path
+
+    @patch("javamcp.__main__.get_default_config_path")
+    def test_resolve_config_path_with_existing_default(self, mock_get_default):
+        """Test that default config path is used when it exists."""
+        mock_path = MagicMock(spec=Path)
+        mock_path.exists.return_value = True
+        mock_path.__str__.return_value = "/home/user/.config/javamcp/config.yml"
+        mock_get_default.return_value = mock_path
+
+        result = resolve_config_path(None)
+
+        assert result == "/home/user/.config/javamcp/config.yml"
+        mock_path.exists.assert_called_once()
+
+    @patch("javamcp.__main__.display_config_error_and_exit")
+    @patch("javamcp.__main__.get_default_config_path")
+    def test_resolve_config_path_without_default(
+        self, mock_get_default, mock_display_error
+    ):
+        """Test that error is displayed when default config doesn't exist."""
+        mock_path = MagicMock(spec=Path)
+        mock_path.exists.return_value = False
+        mock_get_default.return_value = mock_path
+
+        # Mock the exit to prevent actual exit
+        mock_display_error.side_effect = SystemExit(1)
+
+        with pytest.raises(SystemExit):
+            resolve_config_path(None)
+
+        mock_display_error.assert_called_once()
+
+    @patch("javamcp.__main__.sys.exit")
+    @patch("javamcp.__main__.get_config_template")
+    @patch("javamcp.__main__.get_default_config_path")
+    def test_display_config_error_and_exit(
+        self, mock_get_default, mock_get_template, mock_exit
+    ):
+        """Test that error message is displayed correctly."""
+        mock_path = MagicMock(spec=Path)
+        mock_path.__str__.return_value = "/home/user/.config/javamcp/config.yml"
+        mock_get_default.return_value = mock_path
+        mock_get_template.return_value = "sample: config\n"
+
+        with patch("sys.stderr") as mock_stderr:
+            display_config_error_and_exit()
+
+            # Verify error message was printed
+            printed_output = "".join(
+                str(call[0][0]) for call in mock_stderr.write.call_args_list
+            )
+            assert "Error: No configuration file found" in printed_output
+            assert "/home/user/.config/javamcp/config.yml" in printed_output
+            assert "sample: config" in printed_output
+
+            # Verify exit was called with code 1
+            mock_exit.assert_called_once_with(1)
+
+    @patch("javamcp.__main__.sys.exit")
+    @patch("javamcp.__main__.get_config_template")
+    @patch("javamcp.__main__.get_default_config_path")
+    def test_display_config_error_when_template_fails(
+        self, mock_get_default, mock_get_template, mock_exit
+    ):
+        """Test error handling when template cannot be read."""
+        mock_path = MagicMock(spec=Path)
+        mock_get_default.return_value = mock_path
+        mock_get_template.side_effect = RuntimeError("Template error")
+
+        with patch("sys.stderr"):
+            display_config_error_and_exit()
+
+            # Verify exit was called with code 1
+            mock_exit.assert_called_once_with(1)
+
+
+class TestVersion:
+    """Tests for version information."""
+
+    def test_version_is_accessible(self):
+        """Test that __version__ is accessible and non-empty."""
+        assert __version__ is not None
+        assert __version__ != ""
+        assert isinstance(__version__, str)
+
+    def test_version_format(self):
+        """Test that version follows semantic versioning format or is 'unknown'."""
+        # Version should be either semantic version (X.Y.Z) or 'unknown'
+        if __version__ != "unknown":
+            # Semantic versioning pattern: major.minor.patch
+            pattern = r"^\d+\.\d+\.\d+$"
+            assert re.match(
+                pattern, __version__
+            ), f"Version '{__version__}' does not match semantic versioning format"

@@ -42,6 +42,7 @@ Entry point for running JavaMCP server using FastMCP.
 import argparse
 import signal
 import sys
+from pathlib import Path
 
 from javamcp import __version__
 from javamcp.config.loader import load_config
@@ -50,6 +51,94 @@ from javamcp.logging import (get_logger, log_server_shutdown,
 from javamcp.server import (get_state, initialize_server,
                             register_tools_and_resources)
 from javamcp.server_factory import get_mcp_server
+
+try:
+    from importlib.resources import files
+except ImportError:
+    # Fallback for older Python versions (though we require 3.13+)
+    from importlib_resources import files  # type: ignore
+
+
+def get_default_config_path() -> Path:
+    """
+    Get the default configuration file path.
+
+    Returns:
+        Path to default config file: ~/.config/javamcp/config.yml
+    """
+    return Path.home() / ".config" / "javamcp" / "config.yml"
+
+
+def get_config_template() -> str:
+    """
+    Read the sample configuration template from package resources.
+
+    Returns:
+        Contents of config_template.yml as a string
+
+    Raises:
+        RuntimeError: If template file cannot be read
+    """
+    try:
+        template_file = files("javamcp").joinpath("config_template.yml")
+        return template_file.read_text(encoding="utf-8")
+    except Exception as e:
+        raise RuntimeError(f"Failed to read configuration template: {e}") from e
+
+
+def display_config_error_and_exit() -> None:
+    """
+    Display error message when configuration file is not found.
+    Shows the default config path and sample configuration template.
+    Exits with code 1.
+    """
+    default_path = get_default_config_path()
+
+    try:
+        template_content = get_config_template()
+        error_message = f"""Error: No configuration file found.
+
+Please create a configuration file at: {default_path}
+
+You can use the following sample configuration as a template:
+
+{template_content}
+"""
+        print(error_message, file=sys.stderr)
+    except RuntimeError as e:
+        print(f"Error: {e}", file=sys.stderr)
+
+    sys.exit(1)
+
+
+def resolve_config_path(config_arg: str | None) -> str | None:
+    """
+    Resolve the configuration file path.
+
+    If config_arg is provided, use it.
+    If config_arg is None, check for default config at ~/.config/javamcp/config.yml.
+    If default config doesn't exist, display error and exit.
+
+    Args:
+        config_arg: Config path from command line argument (or None)
+
+    Returns:
+        Resolved config path, or None if using defaults
+
+    Side Effects:
+        Exits with error message if default config doesn't exist
+    """
+    if config_arg is not None:
+        return config_arg
+
+    default_path = get_default_config_path()
+
+    if default_path.exists():
+        return str(default_path)
+
+    # Default config doesn't exist - display error and exit
+    display_config_error_and_exit()
+    return None  # Never reached, but satisfies type checker
 
 
 def setup_signal_handlers(logger) -> None:
@@ -103,7 +192,7 @@ def main() -> int:
         Exit code (0 for success, 1 for failure)
     """
     parser = argparse.ArgumentParser(
-        description="JavaMCP Server - MCP server for Java API documentation"
+        description=f"JavaMCP {__version__} - MCP server for Java API " f"documentation"
     )
     parser.add_argument(
         "--version",
@@ -122,13 +211,16 @@ def main() -> int:
     args = parser.parse_args()
 
     try:
+        # Resolve configuration path (uses default if not specified)
+        config_path = resolve_config_path(args.config)
+
         # Load configuration
-        config = load_config(args.config)
+        config = load_config(config_path)
 
         # Setup logging BEFORE creating FastMCP server instance
         # This ensures FastMCP library uses the same logging configuration
         logger = setup_logging(config.logging)
-        log_server_startup(logger, args.config)
+        log_server_startup(logger, config_path)
 
         # Register all MCP tools and resources (creates FastMCP instance)
         logger.info("Registering MCP tools and resources...")
@@ -140,7 +232,7 @@ def main() -> int:
 
         # Initialize server state
         logger.info("Initializing JavaMCP server...")
-        initialize_server(args.config)
+        initialize_server(config_path)
         logger.info("Server initialized successfully")
         logger.info("Starting FastMCP server...")
 

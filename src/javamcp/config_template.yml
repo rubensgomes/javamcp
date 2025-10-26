@@ -1,0 +1,31 @@
+# Configuration for JavaMCP Server
+
+# Server configuration
+server:
+    mode: http # Server mode: "stdio" or "http"
+    host: localhost  # Host for HTTP mode
+    port: 8000  # Port for HTTP mode
+
+# Repository configuration
+repositories:
+    # The default branch in the remote Git repository is cloned.  That is,
+    # the branch that remote's HEAD reference points to. Historically, this
+    # branch has most commonly been named master, but main has become an
+    # increasingly prevalent default in recent years, particularly on
+    # platforms like GitHub. Other names like trunk or development are also
+    # used.
+
+    urls:
+        # TODO: Add your git repo URLs below.  For example:
+        - https://github.com/apache/commons-lang.git
+        - https://github.com/google/guava.git
+    local_base_path: ./repositories  # Local directory for cloned repos
+
+# Logging configuration
+logging:
+    level: DEBUG # Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    date_format: "%Y-%m-%d %H:%M:%S"
+    use_colors: true  # Disable colors if needed
+    output: both # Output: "console", "file", or "both"
+    file_path: /tmp/javamcp.log # Log file path (required if output is "file" or "both")

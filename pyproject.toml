@@ -1,6 +1,6 @@
 [project]
 name = "javamcp"
-version = "0.9.0"
+version = "0.10.0"
 description = "An AI MCP server to expose Java APIs to AI coding assistants."
 readme = "README.md"
 license = "NONE"

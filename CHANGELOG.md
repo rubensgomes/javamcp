@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.0] - 2025-10-25
+
+### Added
+- **Default Configuration Path Support**
+  - JavaMCP now automatically looks for configuration at `~/.config/javamcp/config.yml` when no `--config` flag is provided
+  - Helpful error message with sample configuration template when default config file is not found
+  - Configuration template embedded as package resource for easy reference
+  - New helper functions for config path resolution and error handling
+  - Comprehensive test coverage for config path resolution logic
+  - Documentation updates in CLAUDE.md with default path information
+
+### Changed
+- `__main__.py`: Enhanced configuration resolution logic to support default path
+- Improved user experience by eliminating need to specify config path on every invocation
+
 ## [0.9.0] - 2025-10-25
 
 ### Added

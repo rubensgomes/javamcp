@@ -139,11 +139,10 @@ instructions for reference, and in case I need to update the Java 21+ grammars.
     # Ensure at the top of the project root folder
     # NOTE: this assumes you have cloned this project from a Git repo
     cd $(git rev-parse --show-toplevel) || exit
-    poetry run pylint "src" || {
-     printf "failed pylint.\n" >&2
-     sleep 120
-     exit 1
-    }
+    poetry run pylint \
+      --ignore=src/javamcp/antlr4 \
+      --ignore-paths='^.*/antlr4/.*' \
+      "src/javamcp"
     ```
 
 - Unit testing the project:
@@ -153,11 +152,7 @@ instructions for reference, and in case I need to update the Java 21+ grammars.
     # NOTE: this assumes you have cloned this project from a Git repo
     cd $(git rev-parse --show-toplevel) || exit
     # run pytest with coverage
-    poetry run python -m coverage run -m pytest tests/ || {
-     printf "failed unit testing.\n" >&2
-     sleep 10
-     exit 1
-    }
+    poetry run python -m coverage run -m pytest tests/
     ```
 
 - Generate coverage report:
