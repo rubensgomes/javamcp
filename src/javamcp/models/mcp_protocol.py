@@ -116,13 +116,15 @@ class ExtractApisRequest(BaseModel):
 
     Attributes:
         repository_url: Git repository URL (required)
-        branch: Branch name (default: "main")
+        branch: Branch name (default: None, uses remote's default branch)
         package_filter: Optional package name filter
         class_filter: Optional class name filter
     """
 
     repository_url: str = Field(..., description="Git repository URL")
-    branch: str = Field(default="main", description="Branch name")
+    branch: Optional[str] = Field(
+        None, description="Branch name (None uses remote default)"
+    )
     package_filter: Optional[str] = Field(None, description="Filter by package")
     class_filter: Optional[str] = Field(None, description="Filter by class name")
 

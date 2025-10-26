@@ -106,9 +106,9 @@ class TestFastMCPServer:
         state = get_state()
         state.initialized = False
 
-        initialize_server("/path/to/config.yaml")
+        initialize_server("/path/to/config.yml")
 
-        mock_load_config.assert_called_once_with("/path/to/config.yaml")
+        mock_load_config.assert_called_once_with("/path/to/config.yml")
         assert get_state().initialized
 
     def test_get_state(self):

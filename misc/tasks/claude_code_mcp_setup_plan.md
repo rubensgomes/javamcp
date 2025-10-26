@@ -18,8 +18,8 @@ Set up the JavaMCP v0.2.0 server as a local stdio MCP server in Claude Code.
 1. Add JavaMCP server using CLI:
    ```bash
    claude mcp add javamcp \
-     --env JAVAMCP_CONFIG=/home/rubens/dev/personal/python/javamcp/config.yaml \
-     -- poetry run python -m javamcp --config /home/rubens/dev/personal/python/javamcp/config.yaml
+     --env JAVAMCP_CONFIG=/home/rubens/dev/personal/python/javamcp/config.yml \
+     -- poetry run python -m javamcp --config /home/rubens/dev/personal/python/javamcp/config.yml
    ```
 
 2. Verify server was added:
@@ -45,7 +45,7 @@ Set up the JavaMCP v0.2.0 server as a local stdio MCP server in Claude Code.
            "-m",
            "javamcp",
            "--config",
-           "/home/rubens/dev/personal/python/javamcp/config.yaml"
+           "/home/rubens/dev/personal/python/javamcp/config.yml"
          ],
          "cwd": "/home/rubens/dev/personal/python/javamcp",
          "env": {
@@ -81,7 +81,7 @@ Set up the JavaMCP v0.2.0 server as a local stdio MCP server in Claude Code.
 If server doesn't work:
 1. Check server starts manually:
    ```bash
-   poetry run python -m javamcp --config config.yaml
+   poetry run python -m javamcp --config config.yml
    ```
 
 2. Check Claude Code MCP logs:

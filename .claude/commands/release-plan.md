@@ -13,3 +13,5 @@ argument-hint: Git repository name (e.g., rubensgomes/javamcp)
    You do not have access to the $ARGUMENT repository."
 6. If the repository does not exist, respond with "Error: The repository 
    $ARGUMENT does not exist."
+7. Upon approval of the release plan, you must save the plan, and mark off
+checkboxes as those steps in the plan are completed.

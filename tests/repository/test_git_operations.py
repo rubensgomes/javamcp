@@ -50,6 +50,7 @@ from javamcp.repository.exceptions import (CloneFailedError, GitOperationError,
                                            InvalidRepositoryError)
 from javamcp.repository.git_operations import (checkout_branch,
                                                clone_repository,
+                                               get_current_branch_name,
                                                get_current_commit_hash,
                                                is_git_repository,
                                                pull_repository)
@@ -60,7 +61,7 @@ class TestCloneRepository:
 
     @patch("javamcp.repository.git_operations.Repo")
     def test_clone_repository_success(self, mock_repo_class):
-        """Test successful repository cloning."""
+        """Test successful repository cloning with default branch (None)."""
         mock_repo = MagicMock()
         mock_repo_class.clone_from.return_value = mock_repo
 
@@ -68,7 +69,7 @@ class TestCloneRepository:
 
         assert repo == mock_repo
         mock_repo_class.clone_from.assert_called_once_with(
-            "https://github.com/example/repo.git", "/tmp/repo", branch="main", depth=1
+            "https://github.com/example/repo.git", "/tmp/repo", depth=1
         )
 
     @patch("javamcp.repository.git_operations.Repo")
@@ -97,7 +98,7 @@ class TestCloneRepository:
         clone_repository("https://github.com/example/repo.git", "/tmp/repo", depth=5)
 
         mock_repo_class.clone_from.assert_called_once_with(
-            "https://github.com/example/repo.git", "/tmp/repo", branch="main", depth=5
+            "https://github.com/example/repo.git", "/tmp/repo", depth=5
         )
 
     @patch("javamcp.repository.git_operations.Repo")
@@ -248,3 +249,73 @@ class TestGetCurrentCommitHash:
         commit_hash = get_current_commit_hash("/tmp/repo")
 
         assert commit_hash is None
+
+
+class TestGetCurrentBranchName:
+    """Tests for get_current_branch_name function."""
+
+    @patch("javamcp.repository.git_operations.is_git_repository")
+    @patch("javamcp.repository.git_operations.Repo")
+    def test_get_branch_name_success(self, mock_repo_class, mock_is_git):
+        """Test getting branch name successfully."""
+        mock_is_git.return_value = True
+        mock_repo = MagicMock()
+        mock_repo.head.is_detached = False
+        mock_repo.active_branch.name = "main"
+        mock_repo_class.return_value = mock_repo
+
+        branch_name = get_current_branch_name("/tmp/repo")
+
+        assert branch_name == "main"
+
+    @patch("javamcp.repository.git_operations.is_git_repository")
+    @patch("javamcp.repository.git_operations.Repo")
+    def test_get_branch_name_master(self, mock_repo_class, mock_is_git):
+        """Test getting branch name for master branch."""
+        mock_is_git.return_value = True
+        mock_repo = MagicMock()
+        mock_repo.head.is_detached = False
+        mock_repo.active_branch.name = "master"
+        mock_repo_class.return_value = mock_repo
+
+        branch_name = get_current_branch_name("/tmp/repo")
+
+        assert branch_name == "master"
+
+    @patch("javamcp.repository.git_operations.is_git_repository")
+    @patch("javamcp.repository.git_operations.Repo")
+    def test_get_branch_name_detached_head(self, mock_repo_class, mock_is_git):
+        """Test getting branch name with detached HEAD returns None."""
+        mock_is_git.return_value = True
+        mock_repo = MagicMock()
+        mock_repo.head.is_detached = True
+        mock_repo_class.return_value = mock_repo
+
+        branch_name = get_current_branch_name("/tmp/repo")
+
+        assert branch_name is None
+
+    @patch("javamcp.repository.git_operations.is_git_repository")
+    def test_get_branch_name_invalid_repo(self, mock_is_git):
+        """Test getting branch name from invalid repository raises error."""
+        mock_is_git.return_value = False
+
+        with pytest.raises(InvalidRepositoryError, match="Not a valid Git repository"):
+            get_current_branch_name("/tmp/not-a-repo")
+
+    @patch("javamcp.repository.git_operations.is_git_repository")
+    @patch("javamcp.repository.git_operations.Repo")
+    def test_get_branch_name_fails(self, mock_repo_class, mock_is_git):
+        """Test getting branch name failure returns None."""
+        mock_is_git.return_value = True
+        mock_repo = MagicMock()
+        mock_repo.head.is_detached = False
+        # Configure the mock to raise an exception when accessing active_branch.name
+        type(mock_repo).active_branch = property(
+            lambda self: (_ for _ in ()).throw(Exception("error"))
+        )
+        mock_repo_class.return_value = mock_repo
+
+        branch_name = get_current_branch_name("/tmp/repo")
+
+        assert branch_name is None

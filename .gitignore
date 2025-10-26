@@ -207,4 +207,4 @@ venv/
 
 # Local development
 repositories/
-config.yaml
+config.yml

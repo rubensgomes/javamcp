@@ -47,8 +47,9 @@ from javamcp.config.schema import RepositoryConfig
 from javamcp.models.repository import RepositoryIndex, RepositoryMetadata
 
 from .exceptions import RepositoryNotFoundError
-from .git_operations import (clone_repository, get_current_commit_hash,
-                             is_git_repository, pull_repository)
+from .git_operations import (clone_repository, get_current_branch_name,
+                             get_current_commit_hash, is_git_repository,
+                             pull_repository)
 
 
 class RepositoryManager:
@@ -223,11 +224,12 @@ class RepositoryManager:
         clone_repository(url, local_path, depth=1)
 
         commit_hash = get_current_commit_hash(local_path)
+        branch_name = get_current_branch_name(local_path) or "unknown"
         now = datetime.now()
 
         metadata = RepositoryMetadata(
             url=url,
-            branch="main",
+            branch=branch_name,
             local_path=local_path,
             last_cloned=now,
             last_updated=now,
@@ -241,15 +243,17 @@ class RepositoryManager:
         pull_repository(local_path)
 
         commit_hash = get_current_commit_hash(local_path)
+        branch_name = get_current_branch_name(local_path) or "unknown"
         now = datetime.now()
 
         if url in self.repositories:
             self.repositories[url].last_updated = now
             self.repositories[url].commit_hash = commit_hash
+            self.repositories[url].branch = branch_name
         else:
             metadata = RepositoryMetadata(
                 url=url,
-                branch="main",
+                branch=branch_name,
                 local_path=local_path,
                 last_updated=now,
                 commit_hash=commit_hash,
@@ -259,10 +263,11 @@ class RepositoryManager:
     def _load_existing_repository(self, url: str, local_path: str) -> None:
         """Load metadata for existing repository without updating."""
         commit_hash = get_current_commit_hash(local_path)
+        branch_name = get_current_branch_name(local_path) or "unknown"
 
         metadata = RepositoryMetadata(
             url=url,
-            branch="main",
+            branch=branch_name,
             local_path=local_path,
             commit_hash=commit_hash,
         )

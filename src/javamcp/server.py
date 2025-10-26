@@ -236,7 +236,7 @@ def analyze_class(
 # Tool: Extract APIs
 def extract_apis(
     repository_url: str,
-    branch: str = "main",
+    branch: Optional[str] = None,
     package_filter: Optional[str] = None,
     class_filter: Optional[str] = None,
 ) -> dict:
@@ -248,7 +248,7 @@ def extract_apis(
 
     Args:
         repository_url: Git repository URL (required)
-        branch: Branch name (default: "main")
+        branch: Branch name (default: None, which uses the remote's default branch)
         package_filter: Optional package name filter
         class_filter: Optional class name filter
 
@@ -319,12 +319,18 @@ def extract_apis(
 
     total_methods = sum(len(cls.methods) for cls in parsed_classes)
 
+    # Get the actual branch from repository metadata
+    repo_metadata = repo_manager.get_repository_metadata(request.repository_url)
+    actual_branch = (
+        repo_metadata.branch if repo_metadata else (request.branch or "unknown")
+    )
+
     response = ExtractApisResponse(
         classes=[cls.model_dump() for cls in parsed_classes],
         total_classes=len(parsed_classes),
         total_methods=total_methods,
         repository_url=request.repository_url,
-        branch=request.branch,
+        branch=actual_branch,
     )
 
     return response.model_dump()

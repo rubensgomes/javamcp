@@ -214,7 +214,7 @@ poetry install
 
 ### Running the Server
 ```bash
-poetry run python -m javamcp --config config.yaml
+poetry run python -m javamcp --config config.yml
 ```
 
 ### Running Tests

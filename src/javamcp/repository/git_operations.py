@@ -48,7 +48,7 @@ from .exceptions import (CloneFailedError, GitOperationError,
 
 
 def clone_repository(
-    url: str, local_path: str, branch: str = "main", depth: int = 1
+    url: str, local_path: str, branch: Optional[str] = None, depth: int = 1
 ) -> Repo:
     """
     Clone a Git repository from URL to local path.
@@ -56,7 +56,7 @@ def clone_repository(
     Args:
         url: Git repository URL
         local_path: Local filesystem path for cloning
-        branch: Branch to checkout (default: "main")
+        branch: Branch to checkout (default: None, which clones the remote's default branch)
         depth: Depth of clone history (default: 1 for shallow clone)
 
     Returns:
@@ -66,7 +66,11 @@ def clone_repository(
         CloneFailedError: If cloning fails
     """
     try:
-        repo = Repo.clone_from(url, local_path, branch=branch, depth=depth)
+        # Only pass branch parameter if explicitly specified
+        if branch is not None:
+            repo = Repo.clone_from(url, local_path, branch=branch, depth=depth)
+        else:
+            repo = Repo.clone_from(url, local_path, depth=depth)
         return repo
     except GitCommandError as e:
         raise CloneFailedError(f"Failed to clone repository {url}: {e}") from e
@@ -168,5 +172,30 @@ def get_current_commit_hash(local_path: str) -> Optional[str]:
     try:
         repo = Repo(local_path)
         return repo.head.commit.hexsha
+    except Exception:  # pylint: disable=broad-exception-caught
+        return None
+
+
+def get_current_branch_name(local_path: str) -> Optional[str]:
+    """
+    Get the current branch name of the repository.
+
+    Args:
+        local_path: Local repository path
+
+    Returns:
+        Branch name string, or None if unable to retrieve (e.g., detached HEAD)
+
+    Raises:
+        InvalidRepositoryError: If path is not a valid Git repository
+    """
+    if not is_git_repository(local_path):
+        raise InvalidRepositoryError(f"Not a valid Git repository: {local_path}")
+
+    try:
+        repo = Repo(local_path)
+        if repo.head.is_detached:
+            return None
+        return repo.active_branch.name
     except Exception:  # pylint: disable=broad-exception-caught
         return None

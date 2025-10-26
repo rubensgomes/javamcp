@@ -122,7 +122,7 @@ class TestExtractApisRequest:
             repository_url="https://github.com/example/repo.git"
         )
         assert request.repository_url == "https://github.com/example/repo.git"
-        assert request.branch == "main"
+        assert request.branch is None
 
     def test_extract_apis_request_with_filters(self):
         """Test extract APIs request with filters."""

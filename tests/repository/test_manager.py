@@ -83,10 +83,12 @@ class TestRepositoryManager:
     @patch("javamcp.repository.manager.Path.exists")
     @patch("javamcp.repository.manager.is_git_repository")
     @patch("javamcp.repository.manager.clone_repository")
+    @patch("javamcp.repository.manager.get_current_branch_name")
     @patch("javamcp.repository.manager.get_current_commit_hash")
     def test_initialize_repositories_clone_new(
         self,
         mock_commit_hash,
+        mock_branch_name,
         mock_clone,
         mock_is_git,
         mock_exists,
@@ -101,6 +103,7 @@ class TestRepositoryManager:
 
         mock_exists.return_value = False
         mock_commit_hash.return_value = "abc123"
+        mock_branch_name.return_value = "main"
 
         manager.initialize_repositories()
 
@@ -111,10 +114,12 @@ class TestRepositoryManager:
     @patch("javamcp.repository.manager.Path.exists")
     @patch("javamcp.repository.manager.is_git_repository")
     @patch("javamcp.repository.manager.pull_repository")
+    @patch("javamcp.repository.manager.get_current_branch_name")
     @patch("javamcp.repository.manager.get_current_commit_hash")
     def test_initialize_repositories_update_existing(
         self,
         mock_commit_hash,
+        mock_branch_name,
         mock_pull,
         mock_is_git,
         mock_exists,
@@ -131,6 +136,7 @@ class TestRepositoryManager:
         mock_exists.return_value = True
         mock_is_git.return_value = True
         mock_commit_hash.return_value = "abc123"
+        mock_branch_name.return_value = "main"
 
         manager.initialize_repositories()
 
@@ -140,10 +146,12 @@ class TestRepositoryManager:
     @patch("javamcp.repository.manager.Path.mkdir")
     @patch("javamcp.repository.manager.Path.exists")
     @patch("javamcp.repository.manager.is_git_repository")
+    @patch("javamcp.repository.manager.get_current_branch_name")
     @patch("javamcp.repository.manager.get_current_commit_hash")
     def test_initialize_repositories_no_update(
         self,
         mock_commit_hash,
+        mock_branch_name,
         mock_is_git,
         mock_exists,
         mock_mkdir,
@@ -159,6 +167,7 @@ class TestRepositoryManager:
         mock_exists.return_value = True
         mock_is_git.return_value = True
         mock_commit_hash.return_value = "abc123"
+        mock_branch_name.return_value = "main"
 
         manager.initialize_repositories()
 
@@ -167,9 +176,10 @@ class TestRepositoryManager:
     @patch("javamcp.repository.manager.Path.mkdir")
     @patch("javamcp.repository.manager.Path.exists")
     @patch("javamcp.repository.manager.clone_repository")
+    @patch("javamcp.repository.manager.get_current_branch_name")
     @patch("javamcp.repository.manager.get_current_commit_hash")
     def test_clone_all_repositories(
-        self, mock_commit_hash, mock_clone, mock_exists, mock_mkdir
+        self, mock_commit_hash, mock_branch_name, mock_clone, mock_exists, mock_mkdir
     ):
         """Test cloning all repositories."""
         config = RepositoryConfig(
@@ -183,6 +193,7 @@ class TestRepositoryManager:
 
         mock_exists.return_value = False
         mock_commit_hash.return_value = "abc123"
+        mock_branch_name.return_value = "main"
 
         manager.clone_all_repositories()
 
@@ -201,8 +212,11 @@ class TestRepositoryManager:
             manager.update_repository("https://github.com/other/repo.git")
 
     @patch("javamcp.repository.manager.pull_repository")
+    @patch("javamcp.repository.manager.get_current_branch_name")
     @patch("javamcp.repository.manager.get_current_commit_hash")
-    def test_update_repository_success(self, mock_commit_hash, mock_pull):
+    def test_update_repository_success(
+        self, mock_commit_hash, mock_branch_name, mock_pull
+    ):
         """Test updating existing repository."""
         config = RepositoryConfig(
             urls=["https://github.com/example/repo.git"],
@@ -220,6 +234,7 @@ class TestRepositoryManager:
         manager.repositories["https://github.com/example/repo.git"] = metadata
 
         mock_commit_hash.return_value = "def456"
+        mock_branch_name.return_value = "main"
 
         manager.update_repository("https://github.com/example/repo.git")
 

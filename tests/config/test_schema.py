@@ -121,6 +121,9 @@ class TestLoggingConfig:
         """Test creating logging config with defaults."""
         config = LoggingConfig()
         assert config.level == "INFO"
+        assert config.format == "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        assert config.date_format == "%Y-%m-%d %H:%M:%S"
+        assert config.use_colors is True
         assert config.output == "console"
         assert config.file_path is None
 
@@ -147,6 +150,20 @@ class TestLoggingConfig:
         """Test validation fails for invalid output destination."""
         with pytest.raises(ValidationError):
             LoggingConfig(output="invalid")
+
+    def test_custom_format_and_date_format(self):
+        """Test custom log format and date format."""
+        config = LoggingConfig(
+            format="[%(levelname)s] %(name)s: %(message)s",
+            date_format="%Y/%m/%d %H:%M",
+        )
+        assert config.format == "[%(levelname)s] %(name)s: %(message)s"
+        assert config.date_format == "%Y/%m/%d %H:%M"
+
+    def test_colors_can_be_disabled(self):
+        """Test colors can be disabled via config."""
+        config = LoggingConfig(use_colors=False)
+        assert config.use_colors is False
 
 
 class TestApplicationConfig:

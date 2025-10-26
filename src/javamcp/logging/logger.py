@@ -48,6 +48,70 @@ from typing import Optional
 from javamcp.config.schema import LoggingConfig
 
 
+class ColoredFormatter(logging.Formatter):
+    """
+    Custom formatter that adds ANSI color codes to log levels.
+
+    Colors are only applied when output is to a terminal (TTY).
+    File output always uses plain text without color codes.
+    """
+
+    # ANSI color codes for each log level
+    COLORS = {
+        "DEBUG": "\033[96m",  # Bright Cyan
+        "INFO": "\033[92m",  # Bright Green
+        "WARNING": "\033[93m",  # Bright Yellow
+        "ERROR": "\033[91m",  # Bright Red
+        "CRITICAL": "\033[1;91m",  # Bold Bright Red
+    }
+    RESET = "\033[0m"
+
+    def __init__(
+        self, fmt: str, datefmt: Optional[str] = None, use_colors: bool = True
+    ):
+        """
+        Initialize colored formatter.
+
+        Args:
+            fmt: Log message format
+            datefmt: Date/time format
+            use_colors: Enable color output (also checks if output is TTY)
+        """
+        super().__init__(fmt, datefmt)
+        self.use_colors = use_colors
+
+    def format(self, record: logging.LogRecord) -> str:
+        """
+        Format log record with colored level name.
+
+        Args:
+            record: Log record to format
+
+        Returns:
+            Formatted log message with optional colors
+        """
+        # Only apply colors if enabled and output is a TTY
+        if self.use_colors and hasattr(sys.stderr, "isatty") and sys.stderr.isatty():
+            # Save original levelname
+            original_levelname = record.levelname
+
+            # Apply color to levelname
+            color = self.COLORS.get(record.levelname, "")
+            if color:
+                record.levelname = f"{color}{record.levelname}{self.RESET}"
+
+            # Format the message
+            result = super().format(record)
+
+            # Restore original levelname
+            record.levelname = original_levelname
+
+            return result
+        else:
+            # No colors - just format normally
+            return super().format(record)
+
+
 def setup_logging(config: LoggingConfig) -> logging.Logger:
     """
     Configure logging based on application configuration.
@@ -56,15 +120,22 @@ def setup_logging(config: LoggingConfig) -> logging.Logger:
     to ensure third-party libraries (like FastMCP) use the same logging settings.
 
     Args:
-        config: LoggingConfig with level and file settings
+        config: LoggingConfig with level, format, and file settings
 
     Returns:
         Configured logger instance
     """
-    # Create formatter
-    formatter = logging.Formatter(
-        fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
+    # Create colored formatter for console output
+    console_formatter = ColoredFormatter(
+        fmt=config.format,
+        datefmt=config.date_format,
+        use_colors=config.use_colors,
+    )
+
+    # Create plain formatter for file output (no colors)
+    file_formatter = logging.Formatter(
+        fmt=config.format,
+        datefmt=config.date_format,
     )
 
     # Configure root logger to affect all libraries including FastMCP
@@ -75,7 +146,7 @@ def setup_logging(config: LoggingConfig) -> logging.Logger:
     # Console handler for root logger (use stderr to avoid interfering with stdout)
     console_handler = logging.StreamHandler(sys.stderr)
     console_handler.setLevel(config.level.upper())
-    console_handler.setFormatter(formatter)
+    console_handler.setFormatter(console_formatter)
     root_logger.addHandler(console_handler)
 
     # Rotating file handler for root logger if file path specified
@@ -89,8 +160,44 @@ def setup_logging(config: LoggingConfig) -> logging.Logger:
             backupCount=config.backup_count,
         )
         file_handler.setLevel(config.level.upper())
-        file_handler.setFormatter(formatter)
+        file_handler.setFormatter(file_formatter)  # Use plain formatter for files
         root_logger.addHandler(file_handler)
+
+    # Configure third-party loggers explicitly to use our formatter
+    # Uvicorn, FastMCP, and other libraries create their own loggers that may bypass root logger
+    third_party_loggers = [
+        "uvicorn",
+        "uvicorn.error",
+        "uvicorn.access",
+        "fastmcp",
+        "mcp",
+        "mcp.server",
+        "asyncio",
+    ]
+    for logger_name in third_party_loggers:
+        third_party_logger = logging.getLogger(logger_name)
+        third_party_logger.handlers.clear()
+        third_party_logger.setLevel(config.level.upper())
+        third_party_logger.propagate = (
+            False  # Don't propagate to root to avoid duplicates
+        )
+
+        # Add console handler with colored formatter
+        tp_console_handler = logging.StreamHandler(sys.stderr)
+        tp_console_handler.setLevel(config.level.upper())
+        tp_console_handler.setFormatter(console_formatter)
+        third_party_logger.addHandler(tp_console_handler)
+
+        # Add file handler if configured
+        if config.file_path:
+            tp_file_handler = RotatingFileHandler(
+                config.file_path,
+                maxBytes=config.max_bytes,
+                backupCount=config.backup_count,
+            )
+            tp_file_handler.setLevel(config.level.upper())
+            tp_file_handler.setFormatter(file_formatter)
+            third_party_logger.addHandler(tp_file_handler)
 
     # Get application-specific logger
     logger = logging.getLogger("javamcp")

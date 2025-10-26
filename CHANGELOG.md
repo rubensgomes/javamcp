@@ -5,6 +5,63 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] - 2025-10-25
+
+### Added
+- **Color-Coded Logging System**
+  - ANSI color codes for log levels (DEBUG: Bright Cyan, INFO: Bright Green, WARNING: Bright Yellow, ERROR: Bright Red, CRITICAL: Bold Red)
+  - Unified logging format across all components (javamcp, FastMCP, Uvicorn, third-party libraries)
+  - Automatic color detection (disabled when output is redirected or piped)
+  - Color-free file output (always plain text in log files)
+  - Customizable format and date_format via config.yml
+  - Support for all Python logging format variables
+- **Enhanced Git Repository Operations**
+  - Automatic branch detection for cloned repositories
+  - `get_default_branch()` function to detect remote HEAD branch
+  - Branch name stored in repository metadata
+  - Improved shallow clone functionality
+- **Expanded Python Version Support**
+  - Python version range extended from `<3.14` to `<4.0.0`
+  - Future-proofs project for Python 3.14+ compatibility
+- **Documentation Enhancements**
+  - Comprehensive project structure tree in CLAUDE.md with file-level details
+  - Updated module responsibilities and architecture documentation
+  - Enhanced DEVSETUP.md with clearer instructions
+  - Improved README.md with better project description
+
+### Changed
+- **Logging Configuration**
+  - New `use_colors` option (default: true) for enabling/disabling ANSI colors
+  - Enhanced `format` and `date_format` customization options
+  - Root logger configuration ensures consistent formatting across all libraries
+  - Third-party loggers (FastMCP, Uvicorn) automatically inherit application settings
+- **Configuration Schema**
+  - `LoggingConfig` model updated with color and format options
+  - Validation for logging configuration parameters
+- **Git Operations**
+  - `clone_repository()` now detects and stores default branch name
+  - Enhanced repository metadata with branch information
+- **License**
+  - Changed from Apache-2.0 to NONE (freely distributable)
+  - Updated classifier to "License :: Freely Distributable"
+- **Project Metadata**
+  - Python version requirement: `>=3.13,<4.0.0` (was `>=3.13,<3.14`)
+  - Simplified project description
+
+### Removed
+- **Obsolete Files**
+  - `DISCLAIMER.md` (consolidated into LICENSE)
+  - `config.example.json` (YAML is the standard format)
+  - `config.example.yaml` (example included in documentation)
+
+### Technical
+- All 277 tests passing
+- 95%+ test coverage maintained
+- New test cases for color logging and branch detection
+- Code quality maintained: pylint 9.73/10, black, isort
+- Fully backward compatible
+- No breaking changes to public API
+
 ## [0.8.0] - 2025-10-24
 
 ### Added
@@ -345,6 +402,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fast search and filtering capabilities
 - Context-aware responses for AI coding assistants
 
+[0.9.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.9.0
 [0.8.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.8.0
 [0.7.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.7.0
 [0.6.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.6.0

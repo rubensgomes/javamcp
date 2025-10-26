@@ -11,16 +11,6 @@ The intent is that, during the development of a Java application or library, we
 can incorporate other Java APIs from libraries defined in the “javamcp”
 MCP-configured Git repositories.
 
-## WARNING
-
-**WARNING: AS OF OCT. 24, 2025, THIS PROJECT IS STILL UNDER DEVELOPMENT, AND 
-NOT READY FOR PRODUCTION.**
-
-## AI General Disclaimer
-
-For **AI-GENERATED CONTENT**, please refer to the AI-GENERATED CONTENT
-[DISCLAIMER](DISCLAIMER.md)
-
 ## Features
 
 - **4 MCP Tools** for comprehensive Java API exploration
@@ -33,64 +23,48 @@ For **AI-GENERATED CONTENT**, please refer to the AI-GENERATED CONTENT
 
 ## Installation
 
+NOTE:  instructions provided for Unix-based systems (Linux, macOS) only.
+
 ### Prerequisites
 
+- UNIX-based system (e.g., Linux, macOS)
 - Python 3.13+
-- Poetry (for dependency management and installation)
-- ANTLR4 Java Grammars
-
-Refer to [DEVSETUP.md](./DEVSETUP.md) for further setup instructions.
-
-### Development Setup
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/rubensgomes/javamcp
-   cd javamcp
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   poetry install
-   ```
-
-3. **Generate ANTLR4 Parser (one-time setup):**
-
-   Download Java 21+ grammars
-   from [ANTLR Grammars](https://github.com/antlr/grammars-v4/tree/master/java/java)
-   to the project `grammars` folder:
-
-   ```bash
-   pushd grammars
-   # Generate Python3 lexer and parser files into ../src/javamcp/antlr4
-   antlr4 -Dlanguage=Python3 JavaLexer.g4 JavaParser.g4 -o ../src/javamcp/antlr4
-   popd
-   ```
 
 ## Configuration
 
-Create a configuration file based on the examples:
-
-```bash
-cp config.example.yaml config.yaml
-```
-
-Edit `config.yaml` to add your Java repositories:
+- Create and edit `~/.config/javamcp/config.yml` to add your Git 
+  repositories. For example:
 
 ```yaml
-server:
-    mode: stdio
+# Configuration for JavaMCP Server
 
+# Server configuration
+server:
+    mode: http # Server mode: "stdio" or "http"
+    host: localhost  # Host for HTTP mode
+    port: 8000  # Port for HTTP mode
+
+# Repository configuration
 repositories:
+    # The default branch in the remote Git repository is cloned.  That is, 
+    # the branch that remote's HEAD reference points to. Historically, this 
+    # branch has most commonly been named master, but main has become an 
+    # increasingly prevalent default in recent years, particularly on 
+    # platforms like GitHub. Other names like trunk or development are also
+    # used.
+
     urls:
+        # TODO: Add your git repo URLs below.  For example:
         - https://github.com/apache/commons-lang.git
         - https://github.com/google/guava.git
-    local_base_path: ./repositories
-    branch: main
+    local_base_path: ./repositories  # Local directory for cloned repos
 
+# Logging configuration
 logging:
-    level: INFO
-    output: console
+    level: DEBUG # Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    output: both # Output: "console", "file", or "both"
+    file_path: /tmp/javamcp.log # Log file path (required if output is "file" or "both")
 ```
 
 ## Usage
@@ -98,7 +72,7 @@ logging:
 ### Running the Server
 
 ```bash
-poetry run python -m javamcp --config config.yaml
+poetry run python -m javamcp --config config.yml
 ```
 
 ### MCP Tools
@@ -353,6 +327,17 @@ javamcp/
     ```bash
     claude --verbose --debug ide
     ```
+
+## Development Setup
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/rubensgomes/javamcp
+   cd javamcp
+   ```
+
+2. Follow the instructions in the cloned repository `DEVSETUP.md` file.
+
 
 ---
 Author:  [Rubens Gomes](https://rubensgomes.com/)

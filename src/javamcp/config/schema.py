@@ -123,7 +123,9 @@ class LoggingConfig(BaseModel):
 
     Attributes:
         level: Log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-        format: Log message format
+        format: Log message format (supports Python logging format variables)
+        date_format: Date/time format for log messages (strftime format)
+        use_colors: Enable ANSI color codes for log levels in console output
         output: Log output destination ("console", "file", or "both")
         file_path: Log file path (required if output is "file" or "both")
         max_bytes: Maximum size in bytes before rotating log file (default: 10MB)
@@ -133,7 +135,15 @@ class LoggingConfig(BaseModel):
     level: str = Field(default="INFO", description="Log level")
     format: str = Field(
         default="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        description="Log message format",
+        description="Log message format (Python logging format)",
+    )
+    date_format: str = Field(
+        default="%Y-%m-%d %H:%M:%S",
+        description="Date/time format (strftime format)",
+    )
+    use_colors: bool = Field(
+        default=True,
+        description="Enable colored log levels in console output",
     )
     output: str = Field(default="console", description="Log output destination")
     file_path: Optional[str] = Field(None, description="Log file path")

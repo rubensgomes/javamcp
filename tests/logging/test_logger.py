@@ -40,16 +40,134 @@ Unit tests for logging module.
 """
 
 import logging
+import sys
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 import pytest
 
 from javamcp.config.schema import LoggingConfig
-from javamcp.logging import (ContextLogger, get_logger, log_parse_operation,
-                             log_repository_operation, log_server_shutdown,
-                             log_server_startup, log_tool_invocation,
-                             setup_logging)
+from javamcp.logging import (ColoredFormatter, ContextLogger, get_logger,
+                             log_parse_operation, log_repository_operation,
+                             log_server_shutdown, log_server_startup,
+                             log_tool_invocation, setup_logging)
+
+
+class TestColoredFormatter:
+    """Tests for ColoredFormatter class."""
+
+    def test_colored_formatter_init(self):
+        """Test ColoredFormatter initialization."""
+        formatter = ColoredFormatter(
+            fmt="%(levelname)s - %(message)s",
+            datefmt="%Y-%m-%d",
+            use_colors=True,
+        )
+        assert formatter.use_colors is True
+
+    def test_colored_formatter_without_colors(self):
+        """Test ColoredFormatter with colors disabled."""
+        formatter = ColoredFormatter(
+            fmt="%(levelname)s - %(message)s",
+            use_colors=False,
+        )
+
+        record = logging.LogRecord(
+            name="test",
+            level=logging.INFO,
+            pathname="",
+            lineno=0,
+            msg="Test message",
+            args=(),
+            exc_info=None,
+        )
+
+        result = formatter.format(record)
+        assert "INFO - Test message" in result
+        assert "\033[" not in result  # No ANSI codes
+
+    @patch("sys.stderr")
+    def test_colored_formatter_with_tty(self, mock_stderr):
+        """Test ColoredFormatter with TTY (terminal) output."""
+        mock_stderr.isatty.return_value = True
+
+        formatter = ColoredFormatter(
+            fmt="%(levelname)s - %(message)s",
+            use_colors=True,
+        )
+
+        record = logging.LogRecord(
+            name="test",
+            level=logging.INFO,
+            pathname="",
+            lineno=0,
+            msg="Test message",
+            args=(),
+            exc_info=None,
+        )
+
+        result = formatter.format(record)
+        # Should contain green color code for INFO
+        assert "\033[92m" in result  # Green
+        assert "\033[0m" in result  # Reset
+
+    @patch("sys.stderr")
+    def test_colored_formatter_without_tty(self, mock_stderr):
+        """Test ColoredFormatter without TTY (redirected output)."""
+        mock_stderr.isatty.return_value = False
+
+        formatter = ColoredFormatter(
+            fmt="%(levelname)s - %(message)s",
+            use_colors=True,
+        )
+
+        record = logging.LogRecord(
+            name="test",
+            level=logging.INFO,
+            pathname="",
+            lineno=0,
+            msg="Test message",
+            args=(),
+            exc_info=None,
+        )
+
+        result = formatter.format(record)
+        # Should NOT contain color codes when not TTY
+        assert "\033[" not in result
+
+    @patch("sys.stderr")
+    def test_colored_formatter_different_levels(self, mock_stderr):
+        """Test ColoredFormatter applies correct colors for different levels."""
+        mock_stderr.isatty.return_value = True
+
+        formatter = ColoredFormatter(
+            fmt="%(levelname)s - %(message)s",
+            use_colors=True,
+        )
+
+        # Test different log levels
+        levels_and_colors = [
+            (logging.DEBUG, "\033[96m"),  # Cyan
+            (logging.INFO, "\033[92m"),  # Green
+            (logging.WARNING, "\033[93m"),  # Yellow
+            (logging.ERROR, "\033[91m"),  # Red
+            (logging.CRITICAL, "\033[1;91m"),  # Bold Red
+        ]
+
+        for level, expected_color in levels_and_colors:
+            record = logging.LogRecord(
+                name="test",
+                level=level,
+                pathname="",
+                lineno=0,
+                msg="Test message",
+                args=(),
+                exc_info=None,
+            )
+
+            result = formatter.format(record)
+            assert expected_color in result
 
 
 class TestSetupLogging:
@@ -176,6 +294,48 @@ class TestSetupLogging:
             # File size should be reasonably close to max_bytes after rotation
             assert log_file.stat().st_size < 1000  # Allow some overhead
 
+    def test_setup_logging_configures_third_party_loggers(self):
+        """Test that third-party loggers (Uvicorn, FastMCP, asyncio) are configured."""
+        config = LoggingConfig(level="INFO")
+
+        setup_logging(config)
+
+        # Verify Uvicorn loggers are configured
+        uvicorn_logger = logging.getLogger("uvicorn")
+        assert len(uvicorn_logger.handlers) > 0
+        assert uvicorn_logger.propagate is False
+        assert uvicorn_logger.level == logging.INFO
+
+        uvicorn_error_logger = logging.getLogger("uvicorn.error")
+        assert len(uvicorn_error_logger.handlers) > 0
+        assert uvicorn_error_logger.propagate is False
+
+        # Verify FastMCP loggers are configured
+        fastmcp_logger = logging.getLogger("fastmcp")
+        assert len(fastmcp_logger.handlers) > 0
+        assert fastmcp_logger.propagate is False
+
+        mcp_logger = logging.getLogger("mcp")
+        assert len(mcp_logger.handlers) > 0
+        assert mcp_logger.propagate is False
+
+        # Verify asyncio logger is configured
+        asyncio_logger = logging.getLogger("asyncio")
+        assert len(asyncio_logger.handlers) > 0
+        assert asyncio_logger.propagate is False
+
+    def test_setup_logging_third_party_uses_colored_formatter(self):
+        """Test that third-party loggers use ColoredFormatter."""
+        config = LoggingConfig(level="INFO", use_colors=True)
+
+        setup_logging(config)
+
+        # Check Uvicorn logger uses ColoredFormatter
+        uvicorn_logger = logging.getLogger("uvicorn")
+        assert len(uvicorn_logger.handlers) > 0
+        handler = uvicorn_logger.handlers[0]
+        assert isinstance(handler.formatter, ColoredFormatter)
+
 
 class TestGetLogger:
     """Tests for get_logger function."""
@@ -292,10 +452,10 @@ class TestLogHelpers:
         logger.setLevel(logging.INFO)
 
         with caplog.at_level(logging.INFO, logger="test"):
-            log_server_startup(logger, config_path="/path/to/config.yaml")
+            log_server_startup(logger, config_path="/path/to/config.yml")
 
         assert "JavaMCP server starting" in caplog.text
-        assert "/path/to/config.yaml" in caplog.text
+        assert "/path/to/config.yml" in caplog.text
 
     def test_log_server_shutdown(self, caplog):
         """Test server shutdown logging."""

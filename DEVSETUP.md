@@ -2,6 +2,11 @@
 
 This page contains information to set up the development environment.
 
+## Pre-requisites
+
+- Python 3.13+
+- Poetry (for dependency management and installation)
+
 ## Install required tools
 
 As per [PEP 668](https://peps.python.org/pep-0668/) starting with Python 3.12,
@@ -25,7 +30,7 @@ virtual environments.
     sudo apt install pipx
     ```
 
-- Install several utilities:
+- Install several required utilities:
 
     ```shell
     pip install antlr4-python3-runtime
@@ -46,6 +51,24 @@ virtual environments.
     pipx upgrade poetry
     ```
 
+## Generate ANTLR4 Python Java 21+ Parsers
+
+**NOTE**: This step had to be done at the beginning of the pojrect, and it
+is no longer necessary. The Python Java 21+ Parser files are already stored in
+the project's `src/javamcp/antlr4` folder. I have only included the below
+instructions for reference, and in case I need to update the Java 21+ grammars.
+
+1. Download Java 21+ grammars from [ANTLR Grammars](https://github.
+   com/antlr/grammars-v4/tree/master/java/java) to the project `grammars`
+   folder.
+2. Then, run the `antlr4` parser generator.
+
+   ```shell
+   pushd grammars
+   # Generate Python3 lexer and parser files into ../src/javamcp/antlr4
+   antlr4 -Dlanguage=Python3 JavaLexer.g4 JavaParser.g4 -o ../src/javamcp/antlr4
+   popd
+   ```
 
 ## `poetry` dependencies
 
@@ -157,9 +180,9 @@ Ensure the following tools are installed:
 
 ### Environment Variables
 
-The release process is done on a Linux machine using a "Claude Code" custom 
-slash command `.claude/commands/release-plan.md`.  Therefore, it is expected 
-that a `Claude Code` CLI session is started running on an underlying Linux 
+The release process is done on a Linux machine using a "Claude Code" custom
+slash command `.claude/commands/release-plan.md`. Therefore, it is expected
+that a `Claude Code` CLI session is started running on an underlying Linux
 `bash` shell with the following environment variables set:
 
 **Currently, only Rubens Gomes is able to push a release**
@@ -173,7 +196,7 @@ that a `Claude Code` CLI session is started running on an underlying Linux
 
 ### Generating a release plan
 
-The release plan is generated/executed within `Claude Code`. You must 
+The release plan is generated/executed within `Claude Code`. You must
 start `Claude Code`, and run the following custom slash command:
 
 - Claude code custom slash command:
@@ -182,7 +205,7 @@ start `Claude Code`, and run the following custom slash command:
     /release-plan
     ```
 
-- Then once the plan is reviewed and approved, you prompt `Claude Code` to 
+- Then once the plan is reviewed and approved, you prompt `Claude Code` to
   proceed with the plan.
 
 ## PyCharm IDE Development Environment

@@ -116,7 +116,7 @@ def main() -> int:
         "-c",
         type=str,
         default=None,
-        help="Path to configuration file (YAML or JSON)",
+        help="Path to YAML configuration file",
     )
 
     args = parser.parse_args()
@@ -148,16 +148,17 @@ def main() -> int:
         mcp = get_mcp_server()
 
         # Start FastMCP server - this handles stdio/http modes automatically
+        # Note: We don't pass log_level to mcp.run() because logging is already
+        # configured via setup_logging() which handles all loggers uniformly
         if config.server.mode == "stdio":
             logger.info("Running FastMCP in stdio mode.")
-            mcp.run(log_level=config.logging.level.upper())
+            mcp.run()
         else:
             logger.info("Running FastMCP in normal HTTP mode.")
             mcp.run(
                 transport="http",
                 host=config.server.host,
                 port=config.server.port,
-                log_level=config.logging.level.upper(),
             )
 
         # Shutdown logging (only reached if server stops normally)

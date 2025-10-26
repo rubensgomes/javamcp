@@ -19,8 +19,7 @@ antlr4 -Dlanguage=Python3 JavaLexer.g4 JavaParser.g4 -o ../src/javamcp/antlr4
 popd
 
 # Configure repositories
-cp config.example.yaml config.yaml
-# Edit config.yaml to add Java repository URLs
+# Edit config.yml to add Java repository URLs
 ```
 
 ### Running Tests
@@ -57,7 +56,7 @@ poetry run mypy src/
 ### Running the Server
 ```bash
 # Run with config file
-poetry run python -m javamcp --config config.yaml
+poetry run python -m javamcp --config config.yml
 
 # Run single test
 poetry run pytest tests/path/to/test_file.py::test_function_name
@@ -88,41 +87,102 @@ poetry run python -m semantic_release -vvv publish
 
 ```
 .
-├── src/javamcp/              # Main source code
-│   ├── config/              # Configuration loading and schemas
-│   ├── context/             # Context building and formatting
-│   ├── indexer/             # API indexing and query engine
-│   ├── logging/             # Logging configuration
-│   ├── models/              # Pydantic data models
-│   ├── parser/              # ANTLR4 Java parser and AST visitor
-│   ├── repository/          # Git repository management
-│   ├── resources/           # MCP resource implementations
-│   ├── tools/               # Legacy tool implementations
-│   ├── utils/               # Helper utilities
-│   ├── __main__.py          # Entry point
-│   ├── server.py            # MCP server with tools/resources
-│   └── server_factory.py    # Lazy FastMCP initialization
-├── tests/                   # Test suite (mirrors src/ structure)
+├── src/javamcp/                   # Main source code
+│   ├── config/                   # Configuration loading and schemas
+│   │   ├── loader.py             # YAML/JSON config loader
+│   │   └── schema.py             # Pydantic config models
+│   ├── context/                  # Context building and formatting
+│   │   ├── context_builder.py    # Rich context construction
+│   │   └── formatter.py          # Output formatting
+│   ├── indexer/                  # API indexing and query engine
+│   │   ├── indexer.py            # In-memory API indexer
+│   │   ├── query_engine.py       # Search and query logic
+│   │   └── exceptions.py         # Indexer exceptions
+│   ├── logging/                  # Logging configuration
+│   │   └── logger.py             # Centralized logging setup
+│   ├── models/                   # Pydantic data models
+│   │   ├── java_entities.py      # JavaClass, JavaMethod models
+│   │   ├── mcp_protocol.py       # MCP request/response models
+│   │   └── repository.py         # Repository metadata models
+│   ├── parser/                   # ANTLR4 Java parser and AST visitor
+│   │   ├── java_parser.py        # Main parser orchestration
+│   │   ├── javadoc_parser.py     # Javadoc extraction
+│   │   ├── ast_visitor.py        # ANTLR4 AST visitor
+│   │   └── exceptions.py         # Parser exceptions
+│   ├── repository/               # Git repository management
+│   │   ├── manager.py            # Repository lifecycle management
+│   │   ├── git_operations.py     # Git clone/update operations
+│   │   └── exceptions.py         # Repository exceptions
+│   ├── resources/                # MCP resource implementations
+│   │   └── project_context_builder.py  # Project context resource
+│   ├── tools/                    # Legacy tool implementations
+│   │   ├── search_methods.py     # Search methods tool
+│   │   ├── analyze_class.py      # Analyze class tool
+│   │   ├── extract_apis.py       # Extract APIs tool
+│   │   └── generate_guide.py     # Generate guide tool
+│   ├── utils/                    # Helper utilities
+│   │   └── helpers.py            # Shared utility functions
+│   ├── antlr4/                   # Generated ANTLR4 parser code
+│   ├── __init__.py               # Package initialization
+│   ├── __main__.py               # Entry point
+│   ├── server.py                 # MCP server with tools/resources
+│   └── server_factory.py         # Lazy FastMCP initialization
+├── tests/                        # Test suite (mirrors src/ structure)
 │   ├── config/
+│   │   ├── test_loader.py
+│   │   └── test_schema.py
 │   ├── context/
+│   │   ├── test_context_builder.py
+│   │   └── test_formatter.py
 │   ├── indexer/
+│   │   ├── test_indexer.py
+│   │   └── test_query_engine.py
 │   ├── logging/
+│   │   └── test_logger.py
 │   ├── models/
+│   │   ├── test_java_entities.py
+│   │   ├── test_mcp_protocol.py
+│   │   └── test_repository.py
 │   ├── parser/
+│   │   ├── test_java_parser.py
+│   │   └── test_javadoc_parser.py
 │   ├── repository/
+│   │   ├── test_git_operations.py
+│   │   └── test_manager.py
 │   ├── resources/
+│   │   └── test_project_context_builder.py
 │   ├── server/
+│   │   └── test_server.py
 │   ├── tools/
-│   └── utils/
-├── misc/                    # Project metadata and plans
-│   ├── memory/             # LLM understanding documents
-│   └── tasks/              # Implementation plans and tasks
-├── design/                  # Design documents
-├── grammars/               # ANTLR4 Java grammar files (not in repo)
-├── repositories/           # Cloned Java repos (gitignored)
-├── config.yaml             # Server configuration
-├── config.example.yaml     # Example configuration
-└── pyproject.toml          # Poetry project definition
+│   │   └── test_tools.py
+│   ├── utils/
+│   └── test_main.py
+├── misc/                         # Project metadata and plans
+│   ├── memory/                   # LLM understanding documents
+│   │   ├── PROJ_REQUIREMENTS.md
+│   │   ├── RULES_UNDERSTANDING.md
+│   │   └── USER_CLAUDE.md
+│   └── tasks/                    # Implementation plans and tasks
+│       ├── javamcp_implementation_plan.md
+│       ├── fastmcp_refactor_plan.md
+│       ├── logging_initialization_fix_implementation.md
+│       └── release_plan_*.md     # Various release plans
+├── design/                       # Design documents
+│   └── REQUIREMENTS.md           # Original project requirements
+├── grammars/                     # ANTLR4 Java grammar files
+│   ├── JavaLexer.g4              # Java lexer grammar
+│   ├── JavaParser.g4             # Java parser grammar
+│   └── README.md                 # Grammar documentation
+├── repositories/                 # Cloned Java repos (gitignored)
+├── CHANGELOG.md                  # Version history
+├── CLAUDE.md                     # This file - Claude Code guidance
+├── DEVSETUP.md                   # Development environment setup
+├── LICENSE                       # Apache 2.0 license
+├── MANIFEST.in                   # Python package manifest
+├── README.md                     # Project README
+├── config.yml                    # Server configuration
+├── poetry.lock                   # Locked dependencies
+└── pyproject.toml                # Poetry project definition
 ```
 
 ## Architecture
@@ -204,7 +264,7 @@ All MCP tools access this shared state via `get_state()`. The state is initializ
 
 ## Configuration
 
-The server uses YAML/JSON configuration (`config.yaml`):
+The server uses YAML configuration (`config.yaml`):
 
 ```yaml
 server:
@@ -216,14 +276,42 @@ repositories:
   urls:
     - https://github.com/apache/commons-lang.git
   local_base_path: ./repositories
-  branch: main
+  # Note: Repositories are cloned using their default branch (main, master, etc.)
 
 logging:
-  level: INFO
-  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  level: INFO  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"  # Python logging format
+  date_format: "%Y-%m-%d %H:%M:%S"  # strftime format
+  use_colors: true  # Enable ANSI color codes for log levels
   output: console  # "console", "file", or "both"
-  file_path: null
+  file_path: null  # Required if output is "file" or "both"
 ```
+
+**Repository Cloning Behavior:**
+- JavaMCP automatically clones the default branch from each repository
+- The default branch is detected from the remote repository (e.g., `main`, `master`, `develop`)
+- No manual branch configuration is required
+- The detected branch name is stored in repository metadata
+
+**Logging Configuration:**
+- **Default Format**: `2025-10-25 18:25:55 - javamcp - INFO - Message`
+- **Unified Format**: All logs (javamcp, FastMCP, Uvicorn, third-party libraries) use the same format
+- **Color-Coded Levels**: Log levels are displayed in different colors in terminal output:
+  - `DEBUG` - Bright Cyan
+  - `INFO` - Bright Green
+  - `WARNING` - Bright Yellow
+  - `ERROR` - Bright Red
+  - `CRITICAL` - Bold Red
+- **Colors Auto-Detection**: Colors are automatically disabled when output is redirected or piped
+- **File Output**: Log files never contain color codes (always plain text)
+- **Customizable**: Both format and date_format can be customized via config.yml
+- **Third-Party Integration**: Uvicorn, FastMCP, and other library loggers are automatically configured
+- **Available Format Variables**: All Python logging format variables are supported:
+  - `%(asctime)s` - Timestamp
+  - `%(name)s` - Logger name (e.g., "javamcp", "fastmcp", "uvicorn")
+  - `%(levelname)s` - Log level (DEBUG, INFO, etc.)
+  - `%(message)s` - Log message
+  - `%(pathname)s`, `%(filename)s`, `%(lineno)d`, etc.
 
 ## MCP Tools and Resources
 

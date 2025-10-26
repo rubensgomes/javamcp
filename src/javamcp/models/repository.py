@@ -53,7 +53,7 @@ class RepositoryMetadata(BaseModel):
 
     Attributes:
         url: Git repository URL
-        branch: Branch name (e.g., "main", "master")
+        branch: Branch name (e.g., "main", "master", "develop")
         local_path: Local filesystem path where repository is cloned
         last_cloned: Timestamp of last clone operation
         last_updated: Timestamp of last update (pull) operation
@@ -61,7 +61,7 @@ class RepositoryMetadata(BaseModel):
     """
 
     url: str = Field(..., description="Git repository URL")
-    branch: str = Field(default="main", description="Branch name")
+    branch: str = Field(..., description="Branch name (detected from repository)")
     local_path: str = Field(..., description="Local clone path")
     last_cloned: Optional[datetime] = Field(None, description="Last clone timestamp")
     last_updated: Optional[datetime] = Field(None, description="Last update timestamp")
