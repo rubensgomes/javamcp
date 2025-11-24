@@ -1,0 +1,69 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.1.2 Chrome/138.0.7204.243 Electron/37.4.0 Safari/537.36" version="28.1.2">
+  <diagram name="Page-1" id="-RhZ7fal-UWclWo0L-Yh">
+    <mxGraphModel dx="810" dy="470" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="C_OjBK4VndBu09HUAwvd-5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="C_OjBK4VndBu09HUAwvd-1" target="C_OjBK4VndBu09HUAwvd-4" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="C_OjBK4VndBu09HUAwvd-1" value="Git Repositories&lt;div&gt;(Java sources)&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="40" y="240" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="C_OjBK4VndBu09HUAwvd-4" value="" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="190" y="240" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="C_OjBK4VndBu09HUAwvd-6" value="" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="200" y="250" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="C_OjBK4VndBu09HUAwvd-7" value="" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="200" y="250" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="C_OjBK4VndBu09HUAwvd-10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="C_OjBK4VndBu09HUAwvd-8" target="C_OjBK4VndBu09HUAwvd-9" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="C_OjBK4VndBu09HUAwvd-8" value="Java Source Files" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="210" y="260" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="C_OjBK4VndBu09HUAwvd-18" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="C_OjBK4VndBu09HUAwvd-9" target="C_OjBK4VndBu09HUAwvd-17" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="C_OjBK4VndBu09HUAwvd-9" value="Lexical&amp;nbsp;&lt;div&gt;Analyzer or&amp;nbsp;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Scanner&lt;/span&gt;&lt;div&gt;&lt;div&gt;(ANTLR4)&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="480" y="260" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="C_OjBK4VndBu09HUAwvd-11" value="&lt;br&gt;&lt;strong data-end=&quot;13&quot; data-start=&quot;3&quot;&gt;ANTLR4:&amp;nbsp;&lt;/strong&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;ANother Tool for Language Recognition&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="355" y="650" width="310" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="C_OjBK4VndBu09HUAwvd-13" value="Generate&amp;nbsp;&lt;div&gt;JavaLexer&lt;div&gt;Python Class&lt;/div&gt;&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0.667;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="C_OjBK4VndBu09HUAwvd-12" target="C_OjBK4VndBu09HUAwvd-9" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="630" y="360" as="sourcePoint" />
+            <mxPoint x="500" y="460" as="targetPoint" />
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="C_OjBK4VndBu09HUAwvd-12" value="Java 24&lt;div&gt;Grammar Definition&lt;/div&gt;" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" parent="1" vertex="1">
+          <mxGeometry x="577.5" y="120" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="C_OjBK4VndBu09HUAwvd-14" value="Stream of Raw Characters&lt;div&gt;(program source code)&lt;/div&gt;" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;position2=0.53;" parent="1" vertex="1">
+          <mxGeometry x="330" y="180" width="150" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="C_OjBK4VndBu09HUAwvd-17" value="Parser&amp;nbsp;&lt;div&gt;Analyzer or&amp;nbsp;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Scanner&lt;/span&gt;&lt;div&gt;&lt;div&gt;(ANTLR4)&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="680" y="260" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="C_OjBK4VndBu09HUAwvd-20" value="Tokens&lt;div&gt;&amp;nbsp; - type&lt;/div&gt;&lt;div&gt;&amp;nbsp; - lexme (actual text)&lt;/div&gt;&lt;div&gt;&amp;nbsp; - line number, position,..&lt;/div&gt;" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;position2=0.5;direction=west;align=left;" parent="1" vertex="1">
+          <mxGeometry x="560" y="300" width="155" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="C_OjBK4VndBu09HUAwvd-25" value="Source code consists of:&lt;div&gt;- keywords: if, else,...&lt;/div&gt;&lt;div&gt;- literals: &#39;1&#39;, &#39;a&quot;, ...&lt;/div&gt;&lt;div&gt;- separators: (, ;, { ...&lt;/div&gt;&lt;div&gt;- operators: +, -, &amp;amp;, ...&lt;/div&gt;&lt;div&gt;&lt;br style=&quot;&quot;&gt;&lt;/div&gt;" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;direction=west;align=left;" parent="1" vertex="1">
+          <mxGeometry x="195" y="340" width="160" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="GaklZD10FmzWynyHks-X-1" value="Generate&amp;nbsp;&lt;div&gt;JavaParser&lt;div&gt;Python Class&lt;/div&gt;&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="C_OjBK4VndBu09HUAwvd-12" target="C_OjBK4VndBu09HUAwvd-17">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="730" y="220" as="sourcePoint" />
+            <mxPoint x="660" y="320" as="targetPoint" />
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
