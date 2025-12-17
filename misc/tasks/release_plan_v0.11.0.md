@@ -46,38 +46,38 @@ This release updates project dependencies to their latest stable versions, impro
 
 ### Pre-Release Tasks
 
-- [ ] Review and verify all changes since v0.10.0
-- [ ] Update version number in pyproject.toml (0.10.0 → 0.11.0)
-- [ ] Update CHANGELOG.md with v0.11.0 entry
-- [ ] Run full test suite and verify all tests pass
-- [ ] Run code quality checks (black, isort, pylint, mypy)
-- [ ] Verify test coverage remains above 80%
-- [ ] Commit all changes with appropriate commit message
-- [ ] Push changes to main branch
+- [x] Review and verify all changes since v0.10.0
+- [x] Update version number in pyproject.toml (0.10.0 → 0.11.0)
+- [x] Update CHANGELOG.md with v0.11.0 entry
+- [x] Run full test suite and verify all tests pass
+- [x] Run code quality checks (black, isort, pylint, mypy)
+- [x] Verify test coverage remains above 80%
+- [x] Commit all changes with appropriate commit message
+- [x] Push changes to main branch
 
 ### Release Tasks
 
-- [ ] Create git tag: `git tag v0.11.0`
-- [ ] Push tag to GitHub: `git push origin v0.11.0`
-- [ ] Build package: `poetry build`
-- [ ] Create GitHub release using gh CLI
-- [ ] Upload distribution files to GitHub release
-- [ ] Verify release appears correctly on GitHub
+- [x] Create git tag: `git tag v0.11.0`
+- [x] Push tag to GitHub: `git push origin v0.11.0`
+- [x] Build package: `poetry build`
+- [x] Create GitHub release using gh CLI
+- [x] Upload distribution files to GitHub release
+- [x] Verify release appears correctly on GitHub
 
 ### Post-Release Tasks
 
-- [ ] Verify package installation from built distribution
+- [x] Verify package installation from built distribution
 - [ ] Test MCP tools functionality end-to-end
 - [ ] Update project board/issues if applicable
 
 ## Testing Verification
 
 ### Unit Tests
-- [ ] All existing tests pass (287 tests)
-- [ ] Test coverage > 80% maintained
+- [x] All existing tests pass (287 tests)
+- [x] Test coverage > 80% maintained
 
 ### Manual Testing
-- [ ] Install package from built distribution
+- [x] Install package from built distribution
 - [ ] Verify MCP server starts correctly
 - [ ] Test at least one MCP tool (e.g., search_methods)
 
