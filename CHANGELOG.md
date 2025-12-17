@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.0] - 2025-12-17
+
+### Changed
+- **Dependency Updates**
+  - `fastmcp`: 2.12.5 → 2.14.1 (major feature update)
+  - `pydantic`: 2.12.3 → 2.12.5 (patch update)
+  - `pytest`: 8.4.1 → 8.4.2 (patch update)
+  - `pytest-mock`: 3.14.1 → 3.15.1 (minor update)
+  - `python-semantic-release`: 10.3.1 → 10.5.3 (minor update)
+  - `black`: 25.9.0 → 26.1a1 (alpha pre-release)
+  - `mypy`: 1.18.2 → 1.19.1 (minor update)
+  - `isort`: 6.0.1 → 6.1.0 (minor update)
+  - `coverage`: 7.10.4 → 7.13.0 (minor update)
+  - Dependency version constraints simplified (minimum bounds instead of caret ranges)
+
+- **Code Quality Improvements**
+  - Fixed import order in `__init__.py` - standard imports now before third-party
+  - Switched to relative imports in `__init__.py` for better package structure
+  - Fixed unnecessary `else` after `return` in `logger.py`
+  - Added pylint disable comments for complex functions in `server.py`
+  - Pylint score improved from 9.73/10 to 9.96/10
+
+- **Configuration**
+  - Added explicit `[tool.mypy]` configuration section in `pyproject.toml`
+  - Configured mypy to exclude ANTLR4 generated files
+
+### Technical
+- All 287 tests passing
+- Backward compatible - no breaking changes
+- No functional changes to MCP tools or resources
+
 ## [0.10.0] - 2025-10-25
 
 ### Added
@@ -417,6 +448,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fast search and filtering capabilities
 - Context-aware responses for AI coding assistants
 
+[0.11.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.11.0
+[0.10.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.10.0
 [0.9.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.9.0
 [0.8.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.8.0
 [0.7.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.7.0

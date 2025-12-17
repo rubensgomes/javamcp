@@ -57,7 +57,7 @@ poetry run pylint --ignore-paths='^.*/antlr4/.*' "src/javamcp"
 poetry run isort src/ tests/
 
 # Type checking
-poetry run mypy src/
+poetry run mypy "src/javamcp" 
 ```
 
 ### Running the Server

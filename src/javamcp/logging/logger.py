@@ -107,9 +107,9 @@ class ColoredFormatter(logging.Formatter):
             record.levelname = original_levelname
 
             return result
-        else:
-            # No colors - just format normally
-            return super().format(record)
+
+        # No colors - just format normally
+        return super().format(record)
 
 
 def setup_logging(config: LoggingConfig) -> logging.Logger:

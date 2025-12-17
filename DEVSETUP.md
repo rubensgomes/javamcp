@@ -21,7 +21,7 @@ virtual environments.
     brew install pipx
     ```
 
-- Install python3 and pipx (Linux Ubuntu):
+- Install python3 and pipx (Linux Ubuntu using `apt`):
 
     ```shell
     # Ubuntu Linux commands.

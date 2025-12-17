@@ -124,7 +124,7 @@ class JavaASTVisitor(JavaParserListener):
             if class_ctx.typeList():
                 implements = [t.getText() for t in class_ctx.typeList().typeType()]
 
-        # Extract javadoc
+        # Extract javadoc (returns None by design - uses hidden tokens not accessible via ANTLR4)
         javadoc = self._extract_javadoc_for_context(
             class_ctx
         )  # pylint: disable=assignment-from-none

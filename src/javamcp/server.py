@@ -234,7 +234,7 @@ def analyze_class(
 
 
 # Tool: Extract APIs
-def extract_apis(
+def extract_apis(  # pylint: disable=too-many-locals
     repository_url: str,
     branch: Optional[str] = None,
     package_filter: Optional[str] = None,
@@ -337,7 +337,7 @@ def extract_apis(
 
 
 # Tool: Generate Guide
-def generate_guide(
+def generate_guide(  # pylint: disable=too-many-locals
     use_case: str,
     repository_filter: Optional[str] = None,
     max_results: int = 10,

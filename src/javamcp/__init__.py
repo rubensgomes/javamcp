@@ -45,6 +45,9 @@ Javadocs, method signatures, class hierarchies, and usage examples.
 
 from importlib.metadata import PackageNotFoundError, version
 
+from .server import get_state, initialize_server
+from .server_factory import get_mcp_server
+
 # Read version from package metadata (pyproject.toml)
 try:
     __version__ = version("javamcp")
@@ -54,8 +57,6 @@ except PackageNotFoundError:
 
 __author__ = "JavaMCP Contributors"
 
-from javamcp.server import get_state, initialize_server
-from javamcp.server_factory import get_mcp_server
 
 __all__ = [
     "get_mcp_server",
