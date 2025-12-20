@@ -2,79 +2,126 @@
 
 This page contains information to set up the development environment.
 
-## Pre-requisites
-
-- Python 3.13+
-- Poetry (for dependency management and installation)
-
 ## Install required tools
 
-As per [PEP 668](https://peps.python.org/pep-0668/) starting with Python 3.12,
-non-brew-packaged (macOS) Python package should only be installed in
-virtual environments.
+- pyenv 2.6+
+- python 3.14+
+- pipx 1.4+
+- Poetry 2.2+
+
+### `pyenv`
+
+- Install `pyenv` as follows:
+
+    ```bash
+    mkdir -p "${HOME}/tmp"
+    cd "${HOME}/tmp"
+    git clone https://github.com/pyenv/pyenv.git
+    sudo rm -rf /opt/pyenv
+    sudo mv pyenv /opt/pyenv
+    ```
+
+- Ensure you add the `/opt/yenv/bin` to your environment PATH variable
+
+    ```bash
+    export PATH="${PATH}:/opt/pyenv/bin"
+    ```
+
+### `python`
+
+- Grabs the latest `python` 3.14 version as follows:
+
+    ```bash
+    pyenv install --list | grep '^[[:space:]]*3.14'
+    ```
+
+- Install `python` 3.14 as follows:
+
+    ```bash
+    # assuming 3.14.2 is the latest python 3.14 release.
+    pyenv install "3.14.2"
+    ```
+
+- Configure the `python` global:
+
+    ```bash
+    # assuming 3.14.2 is the latest python 3.14 release.
+    pyenv globa "3.14.2"
+    ```
+
+### `pipx`
 
 - Install python3 and pipx (macOS):
 
-    ```shell
-    # macOS commands.
-    brew install python3
+    ```bash
+    # macOS brew
     brew install pipx
+    pipx ensurepath
     ```
 
 - Install python3 and pipx (Linux Ubuntu using `apt`):
 
-    ```shell
-    # Ubuntu Linux commands.
+    ```bash
+    # Ubuntu Linux apt.
     sudo apt update
-    sudo apt install python3
     sudo apt install pipx
+    pipx ensurepath
     ```
+
+### `poetry` `pylint` `pytest`
+- 
 
 - Install several required utilities:
 
-    ```shell
-    pip install antlr4-python3-runtime
-    pipx ensurepath
-    pipx install fastmcp
+    ```bash
+    pipx install poetry
     pipx install pylint
     pipx install pytest
-    pipx install poetry
-    pipx install python-semantic-release
     ```
-
 - Upgrade above packages installed using `pipx`:
 
-    ```shell
-    pipx upgrade fastmcp
+    ```bash
+    pipx upgrade poetry
     pipx upgrade pylint
     pipx upgrade pytest
-    pipx upgrade poetry
     ```
 
 ## Generate ANTLR4 Python Java 21+ Parsers
 
-**NOTE**: This step had to be done at the beginning of the pojrect, and it
+**NOTE**: This step had to be done at the beginning of the project, and it
 is no longer necessary. The Python Java 21+ Parser files are already stored in
 the project's `src/javamcp/antlr4` folder. I have only included the below
 instructions for reference, and in case I need to update the Java 21+ grammars.
 
-1. Download Java 21+ grammars from [ANTLR Grammars](https://github.
-   com/antlr/grammars-v4/tree/master/java/java) to the project `grammars`
-   folder.
-2. Then, run the `antlr4` parser generator.
+1. Download the following Java 21+ grammars files from
+   [ANTLR Grammars](https://github.com/antlr/grammars-v4/tree/master/java/java)
+   to the project `grammars` folder:
 
-   ```shell
-   pushd grammars
-   # Generate Python3 lexer and parser files into ../src/javamcp/antlr4
-   antlr4 -Dlanguage=Python3 JavaLexer.g4 JavaParser.g4 -o ../src/javamcp/antlr4
-   popd
-   ```
+    - JavaLexer.g4
+    - JavaParser.g4
 
-## `poetry` dependencies
+2. Install `antlr4-python3-runtime` and `antlr4-tools`:
+
+    ```bash
+    pip install antlr4-python3-runtime
+    pip install antlr4-tools
+    ```
+
+3. Then, run the `antlr4` parser generator.
+
+    ```bash
+    cd $(git rev-parse --show-toplevel) || exit
+    pushd grammars
+    # Generate Python3 lexer and parser files into ../src/javamcp/antlr4
+    antlr4 -Dlanguage=Python3 JavaLexer.g4 JavaParser.g4 -o ../src/javamcp/antlr4
+    popd
+    ```
+
+## Python `poetry` commands
 
 - Sample code to add dependencies to the `pyproject.toml`:
 
-    ```shell
+    ```bash
     # Ensure at the top of the project root folder
     # NOTE: this assumes you have cloned this project from a Git repo
     cd $(git rev-parse --show-toplevel) || exit
@@ -86,9 +133,7 @@ instructions for reference, and in case I need to update the Java 21+ grammars.
 
 - Command to upgrade the packages in the `pyproject.toml`:
 
-    ```shell
-    # Ensure at the top of the project root folder
-    # NOTE: this assumes you have cloned this project from a Git repo
+    ```bash
     cd $(git rev-parse --show-toplevel) || exit
     poetry update -vv
     poetry lock --regenerate -vv
@@ -98,12 +143,8 @@ instructions for reference, and in case I need to update the Java 21+ grammars.
 
 - Configure a local project virtual environment:
 
-    ```shell
-    # Ensure at the top of the project root folder
-    # NOTE: this assumes you have cloned this project from a Git repo
+    ```bash
     cd $(git rev-parse --show-toplevel) || exit
-    # Create virtual environment under <project>/.venv
-    poetry config virtualenvs.in-project true
     # poetry automatically uses the existing virtual environment to install packages
     poetry install
     # display information about virtual environment 
@@ -113,31 +154,23 @@ instructions for reference, and in case I need to update the Java 21+ grammars.
 
 - Activate the virtual environment:
 
-    ```shell
-    # Ensure at the top of the project root folder
-    # NOTE: this assumes you have cloned this project from a Git repo
+    ```bash
     cd $(git rev-parse --show-toplevel) || exit
     eval $(poetry env activate)
-    poetry env activate
     ```
 
 - To remove the virtual environment:
 
-    ```shell
-    # Ensure at the top of the project root folder
-    # NOTE: this assumes you have cloned this project from a Git repo
+    ```bash
     cd $(git rev-parse --show-toplevel) || exit
     poetry env remove --all
-    rm -fr .venv/
     ```
 
 ## Linting and Unit Testing
 
 - Linting the project source code:
 
-    ```shell
-    # Ensure at the top of the project root folder
-    # NOTE: this assumes you have cloned this project from a Git repo
+    ```bash
     cd $(git rev-parse --show-toplevel) || exit
     poetry run pylint \
       --ignore=src/javamcp/antlr4 \
@@ -147,9 +180,7 @@ instructions for reference, and in case I need to update the Java 21+ grammars.
 
 - Unit testing the project:
 
-    ```shell
-    # Ensure at the top of the project root folder
-    # NOTE: this assumes you have cloned this project from a Git repo
+    ```bash
     cd $(git rev-parse --show-toplevel) || exit
     # run pytest with coverage
     poetry run python -m coverage run -m pytest tests/
