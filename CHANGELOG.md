@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.0] - 2026-01-02
+
+### Fixed
+- **ANTLR4 Parser Python Compatibility**
+  - Fixed semantic predicates using Java-style `this.` syntax - changed to Python `self.`
+  - Added `IsNotIdentifierAssign()` and `DoLastRecordComponent()` predicate methods to parser
+  - Regenerated parser from updated grammar
+
+- **AST Visitor Parameter Extraction**
+  - Fixed `formalParameterList()` call to use indexed access `formalParameterList(0)`
+  - Removed obsolete `_extract_last_parameter()` method (varargs now handled in `formalParameter`)
+
+### Changed
+- **Grammar Updates** (`grammars/JavaParser.g4`)
+  - Updated annotation parsing with new `annotationFieldValues` and `annotationFieldValue` rules
+  - Simplified `formalParameterList` - removed separate `lastFormalParameter` rule
+  - Added `classType` and `packageName` rules for better type parsing
+  - Varargs (`...`) now handled within `formalParameter` directly
+
+### Technical
+- All 287 tests passing
+- Backward compatible - no breaking API changes
+- Parser regenerated with ANTLR4
+
 ## [0.11.0] - 2025-12-17
 
 ### Changed

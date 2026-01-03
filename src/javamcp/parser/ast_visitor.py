@@ -468,20 +468,14 @@ class JavaASTVisitor(JavaParserListener):
         if not params_ctx or not params_ctx.formalParameterList():
             return parameters
 
-        param_list = params_ctx.formalParameterList()
+        param_list = params_ctx.formalParameterList(0)
 
-        # Extract regular parameters
-        if param_list.formalParameter():
+        # Extract all parameters (including varargs which are part of formalParameter)
+        if param_list and param_list.formalParameter():
             for param_ctx in param_list.formalParameter():
                 param = self._extract_parameter(param_ctx)
                 if param:
                     parameters.append(param)
-
-        # Extract varargs parameter
-        if param_list.lastFormalParameter():
-            param = self._extract_last_parameter(param_list.lastFormalParameter())
-            if param:
-                parameters.append(param)
 
         return parameters
 
@@ -497,36 +491,6 @@ class JavaASTVisitor(JavaParserListener):
         )
 
         # Extract parameter annotations
-        annotations = []
-        if param_ctx.variableModifier():
-            for modifier in param_ctx.variableModifier():
-                if modifier.annotation():
-                    ann = self._extract_annotation(modifier.annotation())
-                    if ann:
-                        annotations.append(ann)
-
-        return JavaParameter(
-            name=param_name,
-            type=param_type,
-            annotations=annotations,
-        )
-
-    def _extract_last_parameter(self, param_ctx) -> Optional[JavaParameter]:
-        """Extract last parameter (potentially varargs)."""
-        param_type = (
-            param_ctx.typeType().getText() if param_ctx.typeType() else "unknown"
-        )
-
-        # Add varargs notation if present
-        if param_ctx.ELLIPSIS():
-            param_type += "..."
-
-        param_name = (
-            param_ctx.variableDeclaratorId().identifier().getText()
-            if param_ctx.variableDeclaratorId().identifier()
-            else "unknown"
-        )
-
         annotations = []
         if param_ctx.variableModifier():
             for modifier in param_ctx.variableModifier():
