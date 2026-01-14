@@ -95,7 +95,7 @@ class TestLoadJsonConfig:
                 "urls": ["https://github.com/example/repo.git"],
                 "local_base_path": "/tmp/repos",
             },
-            "logging": {"level": "DEBUG", "output": "console"},
+            "logging": {"level": "DEBUG", "output": "stderr"},
         }
 
         with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as tmp:
@@ -157,7 +157,7 @@ repositories:
   local_base_path: /tmp/repos
 logging:
   level: INFO
-  output: console
+  output: stderr
 """
 
         with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as tmp:

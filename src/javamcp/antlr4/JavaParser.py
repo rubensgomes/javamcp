@@ -26434,8 +26434,7 @@ class JavaParser(JavaParserBase):
                         )
                         self.state = 1468
                         if not self.precpred(self._ctx, 14):
-                            from antlr4.error.Errors import \
-                                FailedPredicateException
+                            from antlr4.error.Errors import FailedPredicateException
 
                             raise FailedPredicateException(
                                 self, "self.precpred(self._ctx, 14)"
@@ -26469,8 +26468,7 @@ class JavaParser(JavaParserBase):
                         )
                         self.state = 1471
                         if not self.precpred(self._ctx, 13):
-                            from antlr4.error.Errors import \
-                                FailedPredicateException
+                            from antlr4.error.Errors import FailedPredicateException
 
                             raise FailedPredicateException(
                                 self, "self.precpred(self._ctx, 13)"
@@ -26499,8 +26497,7 @@ class JavaParser(JavaParserBase):
                         )
                         self.state = 1474
                         if not self.precpred(self._ctx, 12):
-                            from antlr4.error.Errors import \
-                                FailedPredicateException
+                            from antlr4.error.Errors import FailedPredicateException
 
                             raise FailedPredicateException(
                                 self, "self.precpred(self._ctx, 12)"
@@ -26547,8 +26544,7 @@ class JavaParser(JavaParserBase):
                         )
                         self.state = 1485
                         if not self.precpred(self._ctx, 11):
-                            from antlr4.error.Errors import \
-                                FailedPredicateException
+                            from antlr4.error.Errors import FailedPredicateException
 
                             raise FailedPredicateException(
                                 self, "self.precpred(self._ctx, 11)"
@@ -26582,8 +26578,7 @@ class JavaParser(JavaParserBase):
                         )
                         self.state = 1488
                         if not self.precpred(self._ctx, 9):
-                            from antlr4.error.Errors import \
-                                FailedPredicateException
+                            from antlr4.error.Errors import FailedPredicateException
 
                             raise FailedPredicateException(
                                 self, "self.precpred(self._ctx, 9)"
@@ -26612,8 +26607,7 @@ class JavaParser(JavaParserBase):
                         )
                         self.state = 1491
                         if not self.precpred(self._ctx, 8):
-                            from antlr4.error.Errors import \
-                                FailedPredicateException
+                            from antlr4.error.Errors import FailedPredicateException
 
                             raise FailedPredicateException(
                                 self, "self.precpred(self._ctx, 8)"
@@ -26636,8 +26630,7 @@ class JavaParser(JavaParserBase):
                         )
                         self.state = 1494
                         if not self.precpred(self._ctx, 7):
-                            from antlr4.error.Errors import \
-                                FailedPredicateException
+                            from antlr4.error.Errors import FailedPredicateException
 
                             raise FailedPredicateException(
                                 self, "self.precpred(self._ctx, 7)"
@@ -26660,8 +26653,7 @@ class JavaParser(JavaParserBase):
                         )
                         self.state = 1497
                         if not self.precpred(self._ctx, 6):
-                            from antlr4.error.Errors import \
-                                FailedPredicateException
+                            from antlr4.error.Errors import FailedPredicateException
 
                             raise FailedPredicateException(
                                 self, "self.precpred(self._ctx, 6)"
@@ -26684,8 +26676,7 @@ class JavaParser(JavaParserBase):
                         )
                         self.state = 1500
                         if not self.precpred(self._ctx, 5):
-                            from antlr4.error.Errors import \
-                                FailedPredicateException
+                            from antlr4.error.Errors import FailedPredicateException
 
                             raise FailedPredicateException(
                                 self, "self.precpred(self._ctx, 5)"
@@ -26708,8 +26699,7 @@ class JavaParser(JavaParserBase):
                         )
                         self.state = 1503
                         if not self.precpred(self._ctx, 4):
-                            from antlr4.error.Errors import \
-                                FailedPredicateException
+                            from antlr4.error.Errors import FailedPredicateException
 
                             raise FailedPredicateException(
                                 self, "self.precpred(self._ctx, 4)"
@@ -26732,8 +26722,7 @@ class JavaParser(JavaParserBase):
                         )
                         self.state = 1506
                         if not self.precpred(self._ctx, 3):
-                            from antlr4.error.Errors import \
-                                FailedPredicateException
+                            from antlr4.error.Errors import FailedPredicateException
 
                             raise FailedPredicateException(
                                 self, "self.precpred(self._ctx, 3)"
@@ -26760,8 +26749,7 @@ class JavaParser(JavaParserBase):
                         )
                         self.state = 1512
                         if not self.precpred(self._ctx, 2):
-                            from antlr4.error.Errors import \
-                                FailedPredicateException
+                            from antlr4.error.Errors import FailedPredicateException
 
                             raise FailedPredicateException(
                                 self, "self.precpred(self._ctx, 2)"
@@ -26795,8 +26783,7 @@ class JavaParser(JavaParserBase):
                         )
                         self.state = 1515
                         if not self.precpred(self._ctx, 25):
-                            from antlr4.error.Errors import \
-                                FailedPredicateException
+                            from antlr4.error.Errors import FailedPredicateException
 
                             raise FailedPredicateException(
                                 self, "self.precpred(self._ctx, 25)"
@@ -26821,8 +26808,7 @@ class JavaParser(JavaParserBase):
                         )
                         self.state = 1520
                         if not self.precpred(self._ctx, 24):
-                            from antlr4.error.Errors import \
-                                FailedPredicateException
+                            from antlr4.error.Errors import FailedPredicateException
 
                             raise FailedPredicateException(
                                 self, "self.precpred(self._ctx, 24)"
@@ -26887,8 +26873,7 @@ class JavaParser(JavaParserBase):
                         )
                         self.state = 1535
                         if not self.precpred(self._ctx, 22):
-                            from antlr4.error.Errors import \
-                                FailedPredicateException
+                            from antlr4.error.Errors import FailedPredicateException
 
                             raise FailedPredicateException(
                                 self, "self.precpred(self._ctx, 22)"
@@ -26920,8 +26905,7 @@ class JavaParser(JavaParserBase):
                         )
                         self.state = 1541
                         if not self.precpred(self._ctx, 18):
-                            from antlr4.error.Errors import \
-                                FailedPredicateException
+                            from antlr4.error.Errors import FailedPredicateException
 
                             raise FailedPredicateException(
                                 self, "self.precpred(self._ctx, 18)"
@@ -26948,8 +26932,7 @@ class JavaParser(JavaParserBase):
                         )
                         self.state = 1543
                         if not self.precpred(self._ctx, 10):
-                            from antlr4.error.Errors import \
-                                FailedPredicateException
+                            from antlr4.error.Errors import FailedPredicateException
 
                             raise FailedPredicateException(
                                 self, "self.precpred(self._ctx, 10)"

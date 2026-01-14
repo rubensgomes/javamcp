@@ -47,9 +47,13 @@ from javamcp.config.schema import RepositoryConfig
 from javamcp.models.repository import RepositoryIndex, RepositoryMetadata
 
 from .exceptions import RepositoryNotFoundError
-from .git_operations import (clone_repository, get_current_branch_name,
-                             get_current_commit_hash, is_git_repository,
-                             pull_repository)
+from .git_operations import (
+    clone_repository,
+    get_current_branch_name,
+    get_current_commit_hash,
+    is_git_repository,
+    pull_repository,
+)
 
 
 class RepositoryManager:

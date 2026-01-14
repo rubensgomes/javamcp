@@ -47,9 +47,13 @@ from unittest.mock import MagicMock, mock_open, patch
 import pytest
 
 from javamcp import __version__
-from javamcp.__main__ import (display_config_error_and_exit,
-                              get_config_template, get_default_config_path,
-                              resolve_config_path, setup_signal_handlers)
+from javamcp.__main__ import (
+    display_config_error_and_exit,
+    get_config_template,
+    get_default_config_path,
+    resolve_config_path,
+    setup_signal_handlers,
+)
 
 
 class TestSignalHandlers:

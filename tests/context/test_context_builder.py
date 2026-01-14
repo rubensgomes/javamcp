@@ -40,8 +40,14 @@ Unit tests for ContextBuilder.
 """
 
 from javamcp.context.context_builder import ContextBuilder
-from javamcp.models.java_entities import (JavaAnnotation, JavaClass, JavaDoc,
-                                          JavaField, JavaMethod, JavaParameter)
+from javamcp.models.java_entities import (
+    JavaAnnotation,
+    JavaClass,
+    JavaDoc,
+    JavaField,
+    JavaMethod,
+    JavaParameter,
+)
 
 
 class TestContextBuilder:

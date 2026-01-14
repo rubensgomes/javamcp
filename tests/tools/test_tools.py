@@ -46,12 +46,13 @@ import pytest
 from javamcp.context.context_builder import ContextBuilder
 from javamcp.indexer.indexer import APIIndexer
 from javamcp.indexer.query_engine import QueryEngine
-from javamcp.models.java_entities import (JavaClass, JavaDoc, JavaMethod,
-                                          JavaParameter)
-from javamcp.models.mcp_protocol import (AnalyzeClassRequest,
-                                         ExtractApisRequest,
-                                         GenerateGuideRequest,
-                                         SearchMethodsRequest)
+from javamcp.models.java_entities import JavaClass, JavaDoc, JavaMethod, JavaParameter
+from javamcp.models.mcp_protocol import (
+    AnalyzeClassRequest,
+    ExtractApisRequest,
+    GenerateGuideRequest,
+    SearchMethodsRequest,
+)
 from javamcp.tools.analyze_class import analyze_class_tool
 from javamcp.tools.generate_guide import _extract_keywords, generate_guide_tool
 from javamcp.tools.search_methods import search_methods_tool

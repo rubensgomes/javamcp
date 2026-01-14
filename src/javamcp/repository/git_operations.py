@@ -43,8 +43,7 @@ from typing import Optional
 
 from git import GitCommandError, InvalidGitRepositoryError, Repo
 
-from .exceptions import (CloneFailedError, GitOperationError,
-                         InvalidRepositoryError)
+from .exceptions import CloneFailedError, GitOperationError, InvalidRepositoryError
 
 
 def clone_repository(

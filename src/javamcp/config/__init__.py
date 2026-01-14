@@ -140,7 +140,7 @@ Example YAML configuration:
         format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
         date_format: "%Y-%m-%d %H:%M:%S"
         use_colors: true
-        output: console  # "console", "file", or "both"
+        output: stderr  # "stderr", "file", or "both"
         file_path: null  # Required if output is "file" or "both"
 
 Exported Classes and Functions
@@ -159,8 +159,13 @@ See Also
 """
 
 from .loader import load_config
-from .schema import (ApplicationConfig, LoggingConfig, RepositoryConfig,
-                     ServerConfig, ServerMode)
+from .schema import (
+    ApplicationConfig,
+    LoggingConfig,
+    RepositoryConfig,
+    ServerConfig,
+    ServerMode,
+)
 
 __all__ = [
     "ServerMode",

@@ -41,8 +41,7 @@ Unit tests for QueryEngine.
 
 import pytest
 
-from javamcp.indexer.exceptions import (IndexNotBuiltError,
-                                        RepositoryNotIndexedError)
+from javamcp.indexer.exceptions import IndexNotBuiltError, RepositoryNotIndexedError
 from javamcp.indexer.indexer import APIIndexer
 from javamcp.indexer.query_engine import QueryEngine
 from javamcp.models.java_entities import JavaClass, JavaMethod

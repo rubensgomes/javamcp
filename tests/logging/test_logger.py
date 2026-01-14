@@ -48,10 +48,17 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from javamcp.config.schema import LoggingConfig
-from javamcp.logging import (ColoredFormatter, ContextLogger, get_logger,
-                             log_parse_operation, log_repository_operation,
-                             log_server_shutdown, log_server_startup,
-                             log_tool_invocation, setup_logging)
+from javamcp.logging import (
+    ColoredFormatter,
+    ContextLogger,
+    get_logger,
+    log_parse_operation,
+    log_repository_operation,
+    log_server_shutdown,
+    log_server_startup,
+    log_tool_invocation,
+    setup_logging,
+)
 
 
 class TestColoredFormatter:
@@ -173,8 +180,8 @@ class TestColoredFormatter:
 class TestSetupLogging:
     """Tests for setup_logging function."""
 
-    def test_setup_logging_console_only(self):
-        """Test logging setup with console output only."""
+    def test_setup_logging_stderr_only(self):
+        """Test logging setup with stderr output only."""
         import sys
 
         config = LoggingConfig(level="INFO")

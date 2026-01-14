@@ -43,14 +43,17 @@ import pytest
 from pydantic import ValidationError
 
 from javamcp.models.java_entities import JavaClass, JavaMethod
-from javamcp.models.mcp_protocol import (AnalyzeClassRequest,
-                                         AnalyzeClassResponse, ErrorResponse,
-                                         ExtractApisRequest,
-                                         ExtractApisResponse,
-                                         GenerateGuideRequest,
-                                         GenerateGuideResponse,
-                                         SearchMethodsRequest,
-                                         SearchMethodsResponse)
+from javamcp.models.mcp_protocol import (
+    AnalyzeClassRequest,
+    AnalyzeClassResponse,
+    ErrorResponse,
+    ExtractApisRequest,
+    ExtractApisResponse,
+    GenerateGuideRequest,
+    GenerateGuideResponse,
+    SearchMethodsRequest,
+    SearchMethodsResponse,
+)
 
 
 class TestSearchMethodsRequest:

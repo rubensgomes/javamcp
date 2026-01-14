@@ -296,7 +296,7 @@ logging:
     format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"  # Python logging format
     date_format: "%Y-%m-%d %H:%M:%S"  # strftime format
     use_colors: true  # Enable ANSI color codes for log levels
-    output: console  # "console", "file", or "both"
+    output: stderr  # "stderr", "file", or "both"
     file_path: null  # Required if output is "file" or "both"
 ```
 

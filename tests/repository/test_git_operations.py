@@ -46,14 +46,19 @@ from unittest.mock import MagicMock, patch
 import pytest
 from git import GitCommandError, Repo
 
-from javamcp.repository.exceptions import (CloneFailedError, GitOperationError,
-                                           InvalidRepositoryError)
-from javamcp.repository.git_operations import (checkout_branch,
-                                               clone_repository,
-                                               get_current_branch_name,
-                                               get_current_commit_hash,
-                                               is_git_repository,
-                                               pull_repository)
+from javamcp.repository.exceptions import (
+    CloneFailedError,
+    GitOperationError,
+    InvalidRepositoryError,
+)
+from javamcp.repository.git_operations import (
+    checkout_branch,
+    clone_repository,
+    get_current_branch_name,
+    get_current_commit_hash,
+    is_git_repository,
+    pull_repository,
+)
 
 
 class TestCloneRepository:

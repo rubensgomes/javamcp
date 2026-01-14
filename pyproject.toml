@@ -1,6 +1,6 @@
 [project]
 name = "javamcp"
-version = "0.12.0"
+version = "0.13.0"
 description = "An AI MCP server to expose Java APIs to AI coding assistants."
 readme = "README.md"
 license = "NONE"
@@ -64,6 +64,9 @@ build_command = "poetry build"
 files = ["src/javamcp"]
 exclude = '''(^.*/antlr4/)'''
 
+[tool.isort]
+profile = "black"
+line_length = 88
 
 [build-system]
 requires = ["poetry-core>=2.2.1,<3.0.0"]

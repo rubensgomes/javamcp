@@ -42,9 +42,15 @@ Unit tests for Java entity models.
 import pytest
 from pydantic import ValidationError
 
-from javamcp.models.java_entities import (JavaAnnotation, JavaClass, JavaDoc,
-                                          JavaField, JavaMethod, JavaPackage,
-                                          JavaParameter)
+from javamcp.models.java_entities import (
+    JavaAnnotation,
+    JavaClass,
+    JavaDoc,
+    JavaField,
+    JavaMethod,
+    JavaPackage,
+    JavaParameter,
+)
 
 
 class TestJavaAnnotation:

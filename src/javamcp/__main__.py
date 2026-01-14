@@ -46,10 +46,13 @@ from pathlib import Path
 
 from javamcp import __version__
 from javamcp.config.loader import load_config
-from javamcp.logging import (get_logger, log_server_shutdown,
-                             log_server_startup, setup_logging)
-from javamcp.server import (get_state, initialize_server,
-                            register_tools_and_resources)
+from javamcp.logging import (
+    get_logger,
+    log_server_shutdown,
+    log_server_startup,
+    setup_logging,
+)
+from javamcp.server import get_state, initialize_server, register_tools_and_resources
 from javamcp.server_factory import get_mcp_server
 
 try:
@@ -57,6 +60,63 @@ try:
 except ImportError:
     # Fallback for older Python versions (though we require 3.13+)
     from importlib_resources import files  # type: ignore
+
+
+def get_help_epilog() -> str:
+    """
+    Generate detailed epilog text for CLI help.
+
+    Returns:
+        Formatted string with configuration file documentation
+    """
+    default_path = get_default_config_path()
+    return f"""
+CONFIGURATION FILE
+==================
+
+Default Location:
+  {default_path}
+
+You can also specify a custom config path with --config/-c.
+
+Configuration Properties:
+-------------------------
+
+server:
+  mode: str          Server mode: "stdio" (default) or "http"
+  host: str          Host for HTTP mode (default: "localhost")
+  port: int          Port for HTTP mode (default: 8000)
+
+repositories:
+  urls: list[str]    List of Git repository URLs to clone and parse
+  local_base_path: str
+                     Directory for cloned repositories (default: "./repositories")
+  auto_update: bool  Auto-update repositories on startup (default: true)
+
+logging:
+  level: str         Log level: DEBUG, INFO (default), WARNING, ERROR, CRITICAL
+  format: str        Python logging format string
+  date_format: str   Date format (strftime format)
+  use_colors: bool   Enable ANSI colors in console (default: true)
+  output: str        Output destination: "stderr" (default), "file", or "both"
+  file_path: str     Log file path (required if output is "file" or "both")
+  max_bytes: int     Max log file size before rotation (default: 10MB)
+  backup_count: int  Number of backup log files to keep (default: 5)
+
+EXAMPLES
+========
+
+  # Run with default config (~/.config/javamcp/config.yml)
+  python -m javamcp
+
+  # Run with custom config file
+  python -m javamcp --config /path/to/config.yml
+
+  # Show version
+  python -m javamcp --version
+
+For more information, see: https://github.com/rubensgomes/javamcp
+"""
 
 
 def get_default_config_path() -> Path:
@@ -192,7 +252,27 @@ def main() -> int:
         Exit code (0 for success, 1 for failure)
     """
     parser = argparse.ArgumentParser(
-        description=f"JavaMCP {__version__} - MCP server for Java API " f"documentation"
+        prog="javamcp",
+        description=f"""
+JavaMCP {__version__} - MCP Server for Java API Documentation
+
+JavaMCP is a Model Context Protocol (MCP) server that provides AI coding
+assistants with rich contextual information about Java APIs. It clones
+Java repositories, parses source code using ANTLR4, extracts Javadocs
+and API information, and exposes this data through MCP tools and resources.
+
+MCP Tools:
+  - search_methods    Search for methods by name with optional class filter
+  - analyze_class     Get complete class information by fully-qualified name
+  - extract_apis      Clone/parse repository and extract APIs
+  - generate_guide    Generate usage guide based on use case description
+
+MCP Resources:
+  - javamcp://project/{{repository_name}}/context
+                      Get comprehensive project context
+""",
+        epilog=get_help_epilog(),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(
         "--version",
@@ -205,7 +285,7 @@ def main() -> int:
         "-c",
         type=str,
         default=None,
-        help="Path to YAML configuration file",
+        help="Path to YAML configuration file (default: ~/.config/javamcp/config.yml)",
     )
 
     args = parser.parse_args()

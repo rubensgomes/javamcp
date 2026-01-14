@@ -49,15 +49,17 @@ from javamcp.config.schema import ApplicationConfig, RepositoryConfig
 from javamcp.context.context_builder import ContextBuilder
 from javamcp.indexer.indexer import APIIndexer
 from javamcp.indexer.query_engine import QueryEngine
-from javamcp.models.mcp_protocol import (AnalyzeClassRequest,
-                                         AnalyzeClassResponse,
-                                         ExtractApisRequest,
-                                         ExtractApisResponse,
-                                         GenerateGuideRequest,
-                                         GenerateGuideResponse,
-                                         ProjectContextResponse,
-                                         SearchMethodsRequest,
-                                         SearchMethodsResponse)
+from javamcp.models.mcp_protocol import (
+    AnalyzeClassRequest,
+    AnalyzeClassResponse,
+    ExtractApisRequest,
+    ExtractApisResponse,
+    GenerateGuideRequest,
+    GenerateGuideResponse,
+    ProjectContextResponse,
+    SearchMethodsRequest,
+    SearchMethodsResponse,
+)
 from javamcp.parser.java_parser import JavaSourceParser
 from javamcp.repository.manager import RepositoryManager
 from javamcp.resources.project_context_builder import ProjectContextBuilder

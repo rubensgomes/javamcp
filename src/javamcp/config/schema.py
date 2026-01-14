@@ -126,7 +126,7 @@ class LoggingConfig(BaseModel):
         format: Log message format (supports Python logging format variables)
         date_format: Date/time format for log messages (strftime format)
         use_colors: Enable ANSI color codes for log levels in console output
-        output: Log output destination ("console", "file", or "both")
+        output: Log output destination ("stderr", "file", or "both")
         file_path: Log file path (required if output is "file" or "both")
         max_bytes: Maximum size in bytes before rotating log file (default: 10MB)
         backup_count: Number of backup log files to keep (default: 5)
@@ -145,7 +145,7 @@ class LoggingConfig(BaseModel):
         default=True,
         description="Enable colored log levels in console output",
     )
-    output: str = Field(default="console", description="Log output destination")
+    output: str = Field(default="stderr", description="Log output destination")
     file_path: Optional[str] = Field(None, description="Log file path")
     max_bytes: int = Field(
         default=10485760, description="Maximum log file size before rotation (bytes)"
@@ -168,7 +168,7 @@ class LoggingConfig(BaseModel):
     @classmethod
     def validate_output(cls, v: str) -> str:
         """Validate log output destination."""
-        valid_outputs = {"console", "file", "both"}
+        valid_outputs = {"stderr", "file", "both"}
         v_lower = v.lower()
         if v_lower not in valid_outputs:
             raise ValueError(f"Log output must be one of {valid_outputs}")

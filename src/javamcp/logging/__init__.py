@@ -37,10 +37,17 @@
 
 """Logging module for JavaMCP server."""
 
-from .logger import (ColoredFormatter, ContextLogger, get_logger,
-                     log_parse_operation, log_repository_operation,
-                     log_server_shutdown, log_server_startup,
-                     log_tool_invocation, setup_logging)
+from .logger import (
+    ColoredFormatter,
+    ContextLogger,
+    get_logger,
+    log_parse_operation,
+    log_repository_operation,
+    log_server_shutdown,
+    log_server_startup,
+    log_tool_invocation,
+    setup_logging,
+)
 
 __all__ = [
     "setup_logging",

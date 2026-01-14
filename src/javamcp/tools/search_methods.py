@@ -44,8 +44,7 @@ This module is kept for backwards compatibility and testing purposes.
 
 from javamcp.context.context_builder import ContextBuilder
 from javamcp.indexer.query_engine import QueryEngine
-from javamcp.models.mcp_protocol import (SearchMethodsRequest,
-                                         SearchMethodsResponse)
+from javamcp.models.mcp_protocol import SearchMethodsRequest, SearchMethodsResponse
 
 
 def search_methods_tool(

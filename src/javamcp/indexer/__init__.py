@@ -39,8 +39,12 @@
 API indexing and querying functionality.
 """
 
-from .exceptions import (ClassNotFoundError, IndexNotBuiltError,
-                         MethodNotFoundError, RepositoryNotIndexedError)
+from .exceptions import (
+    ClassNotFoundError,
+    IndexNotBuiltError,
+    MethodNotFoundError,
+    RepositoryNotIndexedError,
+)
 from .indexer import APIIndexer
 from .query_engine import QueryEngine
 

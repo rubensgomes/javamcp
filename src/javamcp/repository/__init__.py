@@ -39,11 +39,19 @@
 Git repository management functionality.
 """
 
-from .exceptions import (CloneFailedError, GitOperationError,
-                         InvalidRepositoryError, RepositoryNotFoundError)
-from .git_operations import (checkout_branch, clone_repository,
-                             get_current_commit_hash, is_git_repository,
-                             pull_repository)
+from .exceptions import (
+    CloneFailedError,
+    GitOperationError,
+    InvalidRepositoryError,
+    RepositoryNotFoundError,
+)
+from .git_operations import (
+    checkout_branch,
+    clone_repository,
+    get_current_commit_hash,
+    is_git_repository,
+    pull_repository,
+)
 from .manager import RepositoryManager
 
 __all__ = [

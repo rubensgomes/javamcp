@@ -5,6 +5,44 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.0] - 2026-01-14
+
+### Added
+- **Enhanced CLI Help Documentation**
+  - Comprehensive `--help` output with detailed epilog
+  - Full configuration file property documentation
+  - Usage examples for common operations
+  - MCP tools and resources overview in description
+  - `get_help_epilog()` function for generating formatted help text
+
+- **isort Black Compatibility**
+  - Added `[tool.isort]` configuration to `pyproject.toml`
+  - Configured `profile = "black"` for consistent formatting
+  - Eliminates conflicts between isort and black formatters
+
+### Changed
+- **README.md Updates**
+  - Python version requirement updated to 3.14+
+  - Added "Displaying the version" section with example commands
+  - Added "Displaying the help" section with example commands
+  - Fixed logging output option from "console" to "stderr"
+
+- **Dependency Updates**
+  - anyio: 4.12.0 → 4.12.1
+  - certifi: 2025.11.12 → 2026.1.4
+  - cyclopts: 4.4.3 → 4.4.5
+  - Various transitive dependency updates
+
+- **Code Formatting**
+  - Import statement formatting cleanup across modules
+  - Consistent multi-line import grouping
+  - All files now pass both black and isort checks
+
+### Technical
+- All 287 tests passing
+- Pylint score: 9.75/10
+- Backward compatible - no breaking changes
+
 ## [0.12.0] - 2026-01-02
 
 ### Fixed
@@ -472,6 +510,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fast search and filtering capabilities
 - Context-aware responses for AI coding assistants
 
+[0.13.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.13.0
+[0.12.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.12.0
 [0.11.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.11.0
 [0.10.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.10.0
 [0.9.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.9.0

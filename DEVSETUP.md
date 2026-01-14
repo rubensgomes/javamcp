@@ -308,7 +308,7 @@ start `Claude Code`, and run the following custom slash command:
 - Claude code custom slash command:
 
     ```text
-    /release-plan
+    /release-plan javamcp
     ```
 
 - Then once the plan is reviewed and approved, you prompt `Claude Code` to
@@ -319,20 +319,17 @@ start `Claude Code`, and run the following custom slash command:
 - First, ensure to follow all the previous steps to "Setting Up Shell
   Development Environment"
 
-1. Open the project `java-mcp` folder using `PyCharm`
+1. Open the project `javamcp` folder using `PyCharm`
 2. Follow instructions
    to [Create a Poetry environment](https://www.jetbrains.com/help/pycharm/poetry.html#poetry-env)
     - Click on the Python Interpreter Selector to "Add New Interpreter"
     - Select "Add Local Interpreter..."
     - Select "Poetry Environment"
-    - Ensure "Base interpreter" is `/opt/homebrew/bin/python3` or
-      `/usr/local/bin/python3` (macOS/Linux only)
     - Ensure "Poetry executable" (e.g., ${HOME}/.local/bin/poetry)
-    - Click the OK button
-3. Go to `PyCharm` > `Settings`
+    - Ensure "Base interpreter" is `poeetry` and the right Python executable.
     - Enter `Python Integrated Tools`
     - Under `Testing` > `Default test runner` select `pytest`
-4. Open `PyCharm` > `Terminal` to go to venv prompt
+3. Open `PyCharm` > `Terminal` to go to venv prompt
     - Ensure .venv correct settings:
 
     ```shell

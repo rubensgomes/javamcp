@@ -42,8 +42,13 @@ Unit tests for configuration schema models.
 import pytest
 from pydantic import ValidationError
 
-from javamcp.config.schema import (ApplicationConfig, LoggingConfig,
-                                   RepositoryConfig, ServerConfig, ServerMode)
+from javamcp.config.schema import (
+    ApplicationConfig,
+    LoggingConfig,
+    RepositoryConfig,
+    ServerConfig,
+    ServerMode,
+)
 
 
 class TestServerMode:
@@ -124,7 +129,7 @@ class TestLoggingConfig:
         assert config.format == "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
         assert config.date_format == "%Y-%m-%d %H:%M:%S"
         assert config.use_colors is True
-        assert config.output == "console"
+        assert config.output == "stderr"
         assert config.file_path is None
 
     def test_create_file_logging_config(self):
@@ -183,7 +188,7 @@ class TestApplicationConfig:
                 urls=["https://github.com/example/repo.git"],
                 local_base_path="/tmp/repos",
             ),
-            logging=LoggingConfig(level="DEBUG", output="console"),
+            logging=LoggingConfig(level="DEBUG", output="stderr"),
         )
         assert config.server.port == 9000
         assert len(config.repositories.urls) == 1
@@ -201,8 +206,8 @@ class TestApplicationConfig:
         with pytest.raises(ValueError, match="file_path must be specified"):
             config.validate_logging_file_path()
 
-    def test_validate_logging_file_path_console_output(self):
-        """Test validation passes when console output without file_path."""
-        config = ApplicationConfig(logging=LoggingConfig(output="console"))
+    def test_validate_logging_file_path_stderr_output(self):
+        """Test validation passes when stderr output without file_path."""
+        config = ApplicationConfig(logging=LoggingConfig(output="stderr"))
         # Should not raise
         config.validate_logging_file_path()

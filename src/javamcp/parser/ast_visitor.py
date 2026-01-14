@@ -44,8 +44,13 @@ from typing import Optional
 from antlr4 import ParserRuleContext
 
 from javamcp.antlr4.JavaParserListener import JavaParserListener
-from javamcp.models.java_entities import (JavaAnnotation, JavaClass, JavaField,
-                                          JavaMethod, JavaParameter)
+from javamcp.models.java_entities import (
+    JavaAnnotation,
+    JavaClass,
+    JavaField,
+    JavaMethod,
+    JavaParameter,
+)
 
 
 class JavaASTVisitor(JavaParserListener):

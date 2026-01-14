@@ -44,8 +44,7 @@ This module is kept for backwards compatibility and testing purposes.
 
 from javamcp.context.context_builder import ContextBuilder
 from javamcp.indexer.query_engine import QueryEngine
-from javamcp.models.mcp_protocol import (AnalyzeClassRequest,
-                                         AnalyzeClassResponse)
+from javamcp.models.mcp_protocol import AnalyzeClassRequest, AnalyzeClassResponse
 
 
 def analyze_class_tool(

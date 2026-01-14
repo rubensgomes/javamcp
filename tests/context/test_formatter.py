@@ -39,12 +39,20 @@
 Unit tests for context formatters.
 """
 
-from javamcp.context.formatter import (format_class_context,
-                                       format_class_hierarchy,
-                                       format_method_context,
-                                       format_method_signature)
-from javamcp.models.java_entities import (JavaAnnotation, JavaClass, JavaDoc,
-                                          JavaField, JavaMethod, JavaParameter)
+from javamcp.context.formatter import (
+    format_class_context,
+    format_class_hierarchy,
+    format_method_context,
+    format_method_signature,
+)
+from javamcp.models.java_entities import (
+    JavaAnnotation,
+    JavaClass,
+    JavaDoc,
+    JavaField,
+    JavaMethod,
+    JavaParameter,
+)
 
 
 class TestFormatClassContext:

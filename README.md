@@ -28,7 +28,7 @@ NOTE:  instructions provided for Unix-based systems (Linux, macOS) only.
 ### Prerequisites
 
 - UNIX-based system (e.g., Linux, macOS)
-- Python 3.13+
+- Python 3.14+
 
 ## Configuration
 
@@ -63,11 +63,25 @@ repositories:
 logging:
     level: DEBUG # Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL
     format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    output: both # Output: "console", "file", or "both"
+    output: both # Output: "stderr", "file", or "both"
     file_path: /tmp/javamcp.log # Log file path (required if output is "file" or "both")
 ```
 
 ## Usage
+
+### Displaying the version
+
+```bash
+poetry run python -m javamcp --version
+poetry run python -m javamcp -v
+```
+
+### Displaying the help
+
+```bash
+poetry run python -m javamcp --help
+poetry run python -m javamcp -h
+```
 
 ### Running the Server
 

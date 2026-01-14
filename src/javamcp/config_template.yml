@@ -27,5 +27,5 @@ logging:
     format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     date_format: "%Y-%m-%d %H:%M:%S"
     use_colors: true  # Disable colors if needed
-    output: both # Output: "console", "file", or "both"
+    output: both # Output: "stderr", "file", or "both"
     file_path: /tmp/javamcp.log # Log file path (required if output is "file" or "both")
