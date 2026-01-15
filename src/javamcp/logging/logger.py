@@ -112,18 +112,63 @@ class ColoredFormatter(logging.Formatter):
         return super().format(record)
 
 
+def _configure_named_loggers(
+    config: LoggingConfig,
+    console_formatter: ColoredFormatter,
+    file_formatter: logging.Formatter,
+) -> None:
+    """
+    Configure named loggers based on config.loggers dict.
+
+    Each named logger gets its own handlers and does not propagate to root,
+    preventing duplicate log messages while allowing per-logger level control.
+
+    Args:
+        config: Logging configuration with loggers dict
+        console_formatter: Formatter for console output
+        file_formatter: Formatter for file output
+    """
+    for logger_name, level in config.loggers.items():
+        named_logger = logging.getLogger(logger_name)
+        named_logger.handlers.clear()
+        named_logger.setLevel(level)
+        named_logger.propagate = False  # Prevent duplicates
+
+        # Add console handler
+        handler = logging.StreamHandler(sys.stderr)
+        handler.setLevel(level)
+        handler.setFormatter(console_formatter)
+        named_logger.addHandler(handler)
+
+        # Add file handler if configured
+        if config.file_path:
+            file_handler = RotatingFileHandler(
+                config.file_path,
+                maxBytes=config.max_bytes,
+                backupCount=config.backup_count,
+            )
+            file_handler.setLevel(level)
+            file_handler.setFormatter(file_formatter)
+            named_logger.addHandler(file_handler)
+
+
 def setup_logging(config: LoggingConfig) -> logging.Logger:
     """
     Configure logging based on application configuration.
 
-    This function configures both the application logger and the root logger
-    to ensure third-party libraries (like FastMCP) use the same logging settings.
+    Supports both legacy single-level configuration and new per-logger
+    configuration with root and loggers sections.
+
+    This function configures:
+    1. Root logger with the effective root level
+    2. Named loggers specified in config.loggers with their individual levels
+    3. The javamcp application logger
 
     Args:
-        config: LoggingConfig with level, format, and file settings
+        config: LoggingConfig with level settings and format options
 
     Returns:
-        Configured logger instance
+        Configured logger instance for javamcp
     """
     # Create colored formatter for console output
     console_formatter = ColoredFormatter(
@@ -138,14 +183,17 @@ def setup_logging(config: LoggingConfig) -> logging.Logger:
         datefmt=config.date_format,
     )
 
+    # Get effective root level (from root.level, legacy level, or default INFO)
+    root_level = config.get_effective_root_level()
+
     # Configure root logger to affect all libraries including FastMCP
     root_logger = logging.getLogger()
-    root_logger.setLevel(config.level.upper())
+    root_logger.setLevel(root_level)
     root_logger.handlers.clear()
 
     # Console handler for root logger (use stderr to avoid interfering with stdout)
     console_handler = logging.StreamHandler(sys.stderr)
-    console_handler.setLevel(config.level.upper())
+    console_handler.setLevel(root_level)
     console_handler.setFormatter(console_formatter)
     root_logger.addHandler(console_handler)
 
@@ -159,52 +207,20 @@ def setup_logging(config: LoggingConfig) -> logging.Logger:
             maxBytes=config.max_bytes,
             backupCount=config.backup_count,
         )
-        file_handler.setLevel(config.level.upper())
+        file_handler.setLevel(root_level)
         file_handler.setFormatter(file_formatter)  # Use plain formatter for files
         root_logger.addHandler(file_handler)
 
-    # Configure third-party loggers explicitly to use our formatter
-    # Uvicorn, FastMCP, and other libraries create their own loggers that may bypass root logger
-    third_party_loggers = [
-        "uvicorn",
-        "uvicorn.error",
-        "uvicorn.access",
-        "fastmcp",
-        "mcp",
-        "mcp.server",
-        "asyncio",
-    ]
-    for logger_name in third_party_loggers:
-        third_party_logger = logging.getLogger(logger_name)
-        third_party_logger.handlers.clear()
-        third_party_logger.setLevel(config.level.upper())
-        third_party_logger.propagate = (
-            False  # Don't propagate to root to avoid duplicates
-        )
-
-        # Add console handler with colored formatter
-        tp_console_handler = logging.StreamHandler(sys.stderr)
-        tp_console_handler.setLevel(config.level.upper())
-        tp_console_handler.setFormatter(console_formatter)
-        third_party_logger.addHandler(tp_console_handler)
-
-        # Add file handler if configured
-        if config.file_path:
-            tp_file_handler = RotatingFileHandler(
-                config.file_path,
-                maxBytes=config.max_bytes,
-                backupCount=config.backup_count,
-            )
-            tp_file_handler.setLevel(config.level.upper())
-            tp_file_handler.setFormatter(file_formatter)
-            third_party_logger.addHandler(tp_file_handler)
+    # Configure named loggers from config.loggers
+    _configure_named_loggers(config, console_formatter, file_formatter)
 
     # Get application-specific logger
     logger = logging.getLogger("javamcp")
-    logger.setLevel(config.level.upper())
 
-    # Don't add handlers to application logger since root logger handles it
-    # This prevents duplicate log messages
+    # If javamcp is explicitly configured, it already has handlers from above
+    # Otherwise, set level to root level (handlers come from root via propagation)
+    if "javamcp" not in config.loggers:
+        logger.setLevel(root_level)
 
     return logger
 

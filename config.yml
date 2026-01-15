@@ -1,0 +1,43 @@
+# Configuration for JavaMCP Server
+
+# Server configuration
+server:
+    mode: http # Server mode: "stdio" or "http"
+    host: localhost  # Host for HTTP mode
+    port: 8000  # Port for HTTP mode
+
+# Repository configuration
+repositories:
+    # The default branch in the remote Git repository is cloned.  That is, 
+    # the branch that remote's HEAD reference points to. Historically, this 
+    # branch has most commonly been named master, but main has become an 
+    # increasingly prevalent default in recent years, particularly on 
+    # platforms like GitHub. Other names like trunk or development are also
+    # used.
+
+    urls:
+        - https://github.com/rubensgomes/ms-fwk-lib
+        - https://github.com/rubensgomes/ms-reqresp-lib
+        - https://github.com/rubensgomes/ms-ex-lib
+    local_base_path: ./repositories  # Local directory for cloned repos
+
+# Logging configuration
+# Supports per-library log levels via root and loggers sections
+logging:
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    use_colors: true
+    output: both  # Output: "stderr", "file", or "both"
+    file_path: /tmp/javamcp.log  # Log file path (required if output is "file" or "both")
+
+    # Root logger configuration (default for all loggers not explicitly configured)
+    root:
+        level: INFO
+
+    # Per-library log level configuration
+    # Loggers not listed here inherit from root level via propagation
+    loggers:
+        javamcp: DEBUG       # Application logger
+        fastmcp: INFO        # FastMCP library
+        uvicorn: WARNING     # Uvicorn server
+        uvicorn.access: WARNING  # Uvicorn access logs
+        asyncio: ERROR       # Asyncio library

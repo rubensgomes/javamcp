@@ -91,7 +91,6 @@ def initialize_server(config_path: str = None) -> None:
     Args:
         config_path: Optional path to configuration file
     """
-    logger.info("Initializing server with configuration from: %s", config_path)
     _state.config = load_config(config_path)
 
     logger.info(

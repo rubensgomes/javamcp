@@ -46,6 +46,7 @@ from javamcp.config.schema import (
     ApplicationConfig,
     LoggingConfig,
     RepositoryConfig,
+    RootLoggerConfig,
     ServerConfig,
     ServerMode,
 )
@@ -125,12 +126,18 @@ class TestLoggingConfig:
     def test_create_default_logging_config(self):
         """Test creating logging config with defaults."""
         config = LoggingConfig()
-        assert config.level == "INFO"
+        # level is None by default (deprecated field)
+        assert config.level is None
+        # root is auto-created by model_validator with default INFO level
+        assert config.root is not None
+        assert config.root.level == "INFO"
+        assert config.get_effective_root_level() == "INFO"
         assert config.format == "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
         assert config.date_format == "%Y-%m-%d %H:%M:%S"
         assert config.use_colors is True
         assert config.output == "stderr"
         assert config.file_path is None
+        assert config.loggers == {}
 
     def test_create_file_logging_config(self):
         """Test creating file logging config."""
@@ -171,6 +178,102 @@ class TestLoggingConfig:
         assert config.use_colors is False
 
 
+class TestRootLoggerConfig:
+    """Tests for RootLoggerConfig model."""
+
+    def test_create_default_root_logger_config(self):
+        """Test creating root logger config with defaults."""
+        config = RootLoggerConfig()
+        assert config.level == "INFO"
+
+    def test_create_root_logger_config_with_level(self):
+        """Test creating root logger config with custom level."""
+        config = RootLoggerConfig(level="DEBUG")
+        assert config.level == "DEBUG"
+
+    def test_root_logger_level_case_insensitive(self):
+        """Test root logger level is converted to uppercase."""
+        config = RootLoggerConfig(level="debug")
+        assert config.level == "DEBUG"
+
+    def test_invalid_root_logger_level_fails(self):
+        """Test validation fails for invalid root logger level."""
+        with pytest.raises(ValidationError):
+            RootLoggerConfig(level="INVALID")
+
+
+class TestLoggingConfigPerLogger:
+    """Tests for per-logger logging configuration."""
+
+    def test_new_format_with_root_and_loggers(self):
+        """Test new format with root and loggers sections."""
+        config = LoggingConfig(
+            root=RootLoggerConfig(level="INFO"),
+            loggers={"fastmcp": "DEBUG", "uvicorn.access": "WARNING"},
+        )
+        assert config.get_effective_root_level() == "INFO"
+        assert config.loggers["fastmcp"] == "DEBUG"
+        assert config.loggers["uvicorn.access"] == "WARNING"
+
+    def test_legacy_format_still_works(self):
+        """Test legacy format with top-level level."""
+        config = LoggingConfig(level="DEBUG")
+        assert config.get_effective_root_level() == "DEBUG"
+        assert config.loggers == {}
+        # root should be auto-created from legacy level
+        assert config.root is not None
+        assert config.root.level == "DEBUG"
+
+    def test_root_takes_precedence_over_legacy_level(self):
+        """Test that root.level takes precedence over legacy level."""
+        config = LoggingConfig(
+            level="DEBUG",  # Should be ignored
+            root=RootLoggerConfig(level="WARNING"),
+        )
+        assert config.get_effective_root_level() == "WARNING"
+
+    def test_default_root_level_is_info(self):
+        """Test default root level when neither root nor level specified."""
+        config = LoggingConfig()
+        assert config.get_effective_root_level() == "INFO"
+
+    def test_invalid_logger_level_fails(self):
+        """Test validation fails for invalid logger level."""
+        with pytest.raises(ValidationError):
+            LoggingConfig(loggers={"mylogger": "INVALID"})
+
+    def test_logger_levels_case_insensitive(self):
+        """Test logger levels are converted to uppercase."""
+        config = LoggingConfig(loggers={"mylogger": "debug"})
+        assert config.loggers["mylogger"] == "DEBUG"
+
+    def test_empty_loggers_dict(self):
+        """Test empty loggers dict is valid."""
+        config = LoggingConfig(
+            root=RootLoggerConfig(level="INFO"),
+            loggers={},
+        )
+        assert config.loggers == {}
+
+    def test_multiple_loggers(self):
+        """Test configuring multiple loggers."""
+        config = LoggingConfig(
+            loggers={
+                "fastmcp": "INFO",
+                "uvicorn": "WARNING",
+                "uvicorn.access": "ERROR",
+                "javamcp": "DEBUG",
+                "asyncio": "ERROR",
+            }
+        )
+        assert len(config.loggers) == 5
+        assert config.loggers["fastmcp"] == "INFO"
+        assert config.loggers["uvicorn"] == "WARNING"
+        assert config.loggers["uvicorn.access"] == "ERROR"
+        assert config.loggers["javamcp"] == "DEBUG"
+        assert config.loggers["asyncio"] == "ERROR"
+
+
 class TestApplicationConfig:
     """Tests for ApplicationConfig model."""
 
@@ -178,7 +281,8 @@ class TestApplicationConfig:
         """Test creating application config with defaults."""
         config = ApplicationConfig()
         assert config.server.mode == ServerMode.STDIO
-        assert config.logging.level == "INFO"
+        # Default logging uses get_effective_root_level() which returns INFO
+        assert config.logging.get_effective_root_level() == "INFO"
 
     def test_create_complete_application_config(self):
         """Test creating complete application config."""
@@ -192,7 +296,21 @@ class TestApplicationConfig:
         )
         assert config.server.port == 9000
         assert len(config.repositories.urls) == 1
-        assert config.logging.level == "DEBUG"
+        # Legacy level is set, so get_effective_root_level returns it
+        assert config.logging.get_effective_root_level() == "DEBUG"
+
+    def test_create_application_config_with_new_logging_format(self):
+        """Test creating application config with new per-logger logging format."""
+        config = ApplicationConfig(
+            logging=LoggingConfig(
+                root=RootLoggerConfig(level="INFO"),
+                loggers={"fastmcp": "DEBUG", "uvicorn": "WARNING"},
+                output="stderr",
+            ),
+        )
+        assert config.logging.get_effective_root_level() == "INFO"
+        assert config.logging.loggers["fastmcp"] == "DEBUG"
+        assert config.logging.loggers["uvicorn"] == "WARNING"
 
     def test_validate_logging_file_path_file_output(self):
         """Test validation fails when file output without file_path."""

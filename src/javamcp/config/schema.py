@@ -42,7 +42,7 @@ Configuration schema using Pydantic models.
 from enum import Enum
 from typing import Optional
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 class ServerMode(str, Enum):
@@ -117,12 +117,39 @@ class RepositoryConfig(BaseModel):
         return v
 
 
+class RootLoggerConfig(BaseModel):
+    """
+    Root logger configuration.
+
+    Attributes:
+        level: Log level for the root logger (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+    """
+
+    level: str = Field(default="INFO", description="Root logger level")
+
+    @field_validator("level")
+    @classmethod
+    def validate_level(cls, v: str) -> str:
+        """Validate log level."""
+        valid_levels = {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}
+        v_upper = v.upper()
+        if v_upper not in valid_levels:
+            raise ValueError(f"Log level must be one of {valid_levels}")
+        return v_upper
+
+
 class LoggingConfig(BaseModel):
     """
     Logging configuration.
 
+    Supports two formats:
+    1. Legacy format with top-level 'level' field
+    2. New format with 'root' and 'loggers' sections for per-library control
+
     Attributes:
-        level: Log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+        level: DEPRECATED - Global log level (use root.level instead)
+        root: Root logger configuration
+        loggers: Dict mapping logger names to their log levels
         format: Log message format (supports Python logging format variables)
         date_format: Date/time format for log messages (strftime format)
         use_colors: Enable ANSI color codes for log levels in console output
@@ -132,7 +159,20 @@ class LoggingConfig(BaseModel):
         backup_count: Number of backup log files to keep (default: 5)
     """
 
-    level: str = Field(default="INFO", description="Log level")
+    # Legacy field (optional for backward compatibility)
+    level: Optional[str] = Field(
+        default=None,
+        description="DEPRECATED: Global log level (use root.level instead)",
+    )
+
+    # New hierarchical configuration
+    root: Optional[RootLoggerConfig] = Field(
+        default=None, description="Root logger configuration"
+    )
+    loggers: dict[str, str] = Field(
+        default_factory=dict,
+        description="Named logger levels (logger_name: level)",
+    )
     format: str = Field(
         default="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         description="Log message format (Python logging format)",
@@ -156,13 +196,31 @@ class LoggingConfig(BaseModel):
 
     @field_validator("level")
     @classmethod
-    def validate_level(cls, v: str) -> str:
-        """Validate log level."""
+    def validate_level(cls, v: Optional[str]) -> Optional[str]:
+        """Validate log level if provided."""
+        if v is None:
+            return None
         valid_levels = {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}
         v_upper = v.upper()
         if v_upper not in valid_levels:
             raise ValueError(f"Log level must be one of {valid_levels}")
         return v_upper
+
+    @field_validator("loggers")
+    @classmethod
+    def validate_loggers(cls, v: dict[str, str]) -> dict[str, str]:
+        """Validate all logger levels in the dict."""
+        valid_levels = {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}
+        result = {}
+        for logger_name, level in v.items():
+            level_upper = level.upper()
+            if level_upper not in valid_levels:
+                raise ValueError(
+                    f"Invalid level '{level}' for logger '{logger_name}'. "
+                    f"Must be one of {valid_levels}"
+                )
+            result[logger_name] = level_upper
+        return result
 
     @field_validator("output")
     @classmethod
@@ -189,6 +247,29 @@ class LoggingConfig(BaseModel):
         if v < 0:
             raise ValueError("backup_count must be non-negative")
         return v
+
+    @model_validator(mode="after")
+    def resolve_root_level(self) -> "LoggingConfig":
+        """
+        Resolve root level from legacy 'level' field or new 'root' section.
+
+        Priority:
+        1. If 'root' is specified, use root.level
+        2. If 'level' is specified (legacy), use it as root level
+        3. Default to INFO
+        """
+        if self.root is None:
+            root_level = self.level if self.level else "INFO"
+            object.__setattr__(self, "root", RootLoggerConfig(level=root_level))
+        return self
+
+    def get_effective_root_level(self) -> str:
+        """Get the effective root logger level."""
+        if self.root:
+            return self.root.level
+        if self.level:
+            return self.level
+        return "INFO"
 
 
 class ApplicationConfig(BaseModel):

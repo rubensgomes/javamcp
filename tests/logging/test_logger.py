@@ -47,7 +47,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from javamcp.config.schema import LoggingConfig
+from javamcp.config.schema import LoggingConfig, RootLoggerConfig
 from javamcp.logging import (
     ColoredFormatter,
     ContextLogger,
@@ -301,47 +301,148 @@ class TestSetupLogging:
             # File size should be reasonably close to max_bytes after rotation
             assert log_file.stat().st_size < 1000  # Allow some overhead
 
-    def test_setup_logging_configures_third_party_loggers(self):
-        """Test that third-party loggers (Uvicorn, FastMCP, asyncio) are configured."""
-        config = LoggingConfig(level="INFO")
+    def test_setup_logging_configures_named_loggers_from_config(self):
+        """Test that named loggers are configured from config.loggers dict."""
+        config = LoggingConfig(
+            root=RootLoggerConfig(level="INFO"),
+            loggers={
+                "uvicorn": "WARNING",
+                "fastmcp": "DEBUG",
+            },
+        )
 
         setup_logging(config)
 
-        # Verify Uvicorn loggers are configured
+        # Verify uvicorn logger is configured with its specific level
         uvicorn_logger = logging.getLogger("uvicorn")
         assert len(uvicorn_logger.handlers) > 0
         assert uvicorn_logger.propagate is False
-        assert uvicorn_logger.level == logging.INFO
+        assert uvicorn_logger.level == logging.WARNING
 
-        uvicorn_error_logger = logging.getLogger("uvicorn.error")
-        assert len(uvicorn_error_logger.handlers) > 0
-        assert uvicorn_error_logger.propagate is False
-
-        # Verify FastMCP loggers are configured
+        # Verify fastmcp logger is configured with its specific level
         fastmcp_logger = logging.getLogger("fastmcp")
         assert len(fastmcp_logger.handlers) > 0
         assert fastmcp_logger.propagate is False
+        assert fastmcp_logger.level == logging.DEBUG
 
-        mcp_logger = logging.getLogger("mcp")
-        assert len(mcp_logger.handlers) > 0
-        assert mcp_logger.propagate is False
-
-        # Verify asyncio logger is configured
-        asyncio_logger = logging.getLogger("asyncio")
-        assert len(asyncio_logger.handlers) > 0
-        assert asyncio_logger.propagate is False
-
-    def test_setup_logging_third_party_uses_colored_formatter(self):
-        """Test that third-party loggers use ColoredFormatter."""
-        config = LoggingConfig(level="INFO", use_colors=True)
+    def test_setup_logging_named_loggers_use_colored_formatter(self):
+        """Test that named loggers use ColoredFormatter."""
+        config = LoggingConfig(
+            root=RootLoggerConfig(level="INFO"),
+            loggers={"testlogger": "DEBUG"},
+            use_colors=True,
+        )
 
         setup_logging(config)
 
-        # Check Uvicorn logger uses ColoredFormatter
-        uvicorn_logger = logging.getLogger("uvicorn")
-        assert len(uvicorn_logger.handlers) > 0
-        handler = uvicorn_logger.handlers[0]
+        # Check test logger uses ColoredFormatter
+        test_logger = logging.getLogger("testlogger")
+        assert len(test_logger.handlers) > 0
+        handler = test_logger.handlers[0]
         assert isinstance(handler.formatter, ColoredFormatter)
+
+    def test_setup_logging_unconfigured_loggers_use_root(self):
+        """Test that loggers not in config inherit from root via propagation."""
+        config = LoggingConfig(
+            root=RootLoggerConfig(level="WARNING"),
+            loggers={"configured": "DEBUG"},  # Only this one is explicitly configured
+        )
+
+        setup_logging(config)
+
+        # Unconfigured logger should have default propagate=True and use root handlers
+        unconfigured_logger = logging.getLogger("unconfigured")
+        # This logger was not explicitly configured, so it propagates to root
+        assert unconfigured_logger.propagate is True
+
+
+class TestSetupLoggingPerLogger:
+    """Tests for per-logger setup_logging functionality."""
+
+    def test_setup_logging_with_root_and_loggers(self):
+        """Test logging setup with root and named loggers."""
+        config = LoggingConfig(
+            root=RootLoggerConfig(level="INFO"),
+            loggers={"fastmcp": "DEBUG", "uvicorn": "WARNING"},
+        )
+
+        logger = setup_logging(config)
+
+        # Check root logger
+        root_logger = logging.getLogger()
+        assert root_logger.level == logging.INFO
+
+        # Check named loggers
+        fastmcp_logger = logging.getLogger("fastmcp")
+        assert fastmcp_logger.level == logging.DEBUG
+        assert fastmcp_logger.propagate is False
+
+        uvicorn_logger = logging.getLogger("uvicorn")
+        assert uvicorn_logger.level == logging.WARNING
+        assert uvicorn_logger.propagate is False
+
+    def test_setup_logging_javamcp_explicit_level(self):
+        """Test javamcp logger uses explicit level from config."""
+        config = LoggingConfig(
+            root=RootLoggerConfig(level="INFO"),
+            loggers={"javamcp": "DEBUG"},
+        )
+
+        logger = setup_logging(config)
+
+        assert logger.name == "javamcp"
+        assert logger.level == logging.DEBUG
+
+    def test_setup_logging_javamcp_inherits_root(self):
+        """Test javamcp logger inherits root level when not explicitly set."""
+        config = LoggingConfig(
+            root=RootLoggerConfig(level="WARNING"),
+            loggers={"fastmcp": "DEBUG"},  # javamcp not in here
+        )
+
+        logger = setup_logging(config)
+
+        assert logger.name == "javamcp"
+        assert logger.level == logging.WARNING
+
+    def test_setup_logging_legacy_format(self):
+        """Test legacy format continues to work."""
+        config = LoggingConfig(level="DEBUG")
+
+        logger = setup_logging(config)
+
+        root_logger = logging.getLogger()
+        assert root_logger.level == logging.DEBUG
+        assert logger.level == logging.DEBUG
+
+    def test_named_loggers_get_handlers(self):
+        """Test named loggers receive their own handlers."""
+        config = LoggingConfig(
+            root=RootLoggerConfig(level="INFO"),
+            loggers={"testlogger_handlers": "DEBUG"},
+        )
+
+        setup_logging(config)
+
+        test_logger = logging.getLogger("testlogger_handlers")
+        assert len(test_logger.handlers) > 0
+        assert isinstance(test_logger.handlers[0], logging.StreamHandler)
+
+    def test_named_loggers_with_file_output(self, tmp_path):
+        """Test named loggers get file handlers when file output configured."""
+        log_file = tmp_path / "test.log"
+        config = LoggingConfig(
+            root=RootLoggerConfig(level="INFO"),
+            loggers={"testlogger_file": "DEBUG"},
+            file_path=str(log_file),
+        )
+
+        setup_logging(config)
+
+        test_logger = logging.getLogger("testlogger_file")
+        handler_types = [type(h).__name__ for h in test_logger.handlers]
+        assert "StreamHandler" in handler_types
+        assert "RotatingFileHandler" in handler_types
 
 
 class TestGetLogger:

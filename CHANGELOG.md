@@ -5,6 +5,43 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.15.0] - 2026-01-15
+
+### Added
+- **Hierarchical Logging Configuration**
+  - New `root` section for configuring root logger level
+  - New `loggers` dictionary for per-logger level configuration
+  - Individual log level control for specific loggers (e.g., `uvicorn: WARNING`, `fastmcp: DEBUG`)
+  - `RootLoggerConfig` Pydantic model for root logger settings
+  - `get_effective_root_level()` method for resolving the effective root level
+
+- **Named Logger Support**
+  - `_configure_named_loggers()` function for setting up individual logger handlers
+  - Each named logger gets its own handlers with `propagate=False` to prevent duplicates
+  - Per-logger file output support when file logging is enabled
+
+### Changed
+- **Logging Configuration Schema**
+  - `level` field now optional and deprecated (use `root.level` instead)
+  - `root` field added for new hierarchical configuration
+  - `loggers` field added as dict mapping logger names to levels
+  - Automatic migration: legacy `level` field still works for backward compatibility
+
+- **Logger Setup Logic**
+  - Removed hardcoded third-party logger list (uvicorn, fastmcp, mcp, etc.)
+  - Named loggers now configured dynamically from `config.loggers` dict
+  - Root logger always configured with effective root level
+
+- **CLI Help Documentation**
+  - Updated examples to use `poetry run python -m javamcp` syntax
+  - Added installation prerequisite (`poetry install`)
+  - Reordered examples: version, help, then run commands
+
+### Technical
+- All 307 tests passing (20 new tests from v0.14.0)
+- Pylint score: 9.77/10
+- Backward compatible - existing configs work without changes
+
 ## [0.14.0] - 2026-01-14
 
 ### Added
@@ -536,6 +573,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fast search and filtering capabilities
 - Context-aware responses for AI coding assistants
 
+[0.15.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.15.0
+[0.14.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.14.0
 [0.13.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.13.0
 [0.12.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.12.0
 [0.11.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.11.0

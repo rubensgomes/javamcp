@@ -292,12 +292,23 @@ repositories:
     # Note: Repositories are cloned using their default branch (main, master, etc.)
 
 logging:
-    level: INFO  # DEBUG, INFO, WARNING, ERROR, CRITICAL
     format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"  # Python logging format
     date_format: "%Y-%m-%d %H:%M:%S"  # strftime format
     use_colors: true  # Enable ANSI color codes for log levels
     output: stderr  # "stderr", "file", or "both"
     file_path: null  # Required if output is "file" or "both"
+
+    # Hierarchical logging configuration (v0.15.0+)
+    root:
+        level: INFO  # Default level for all loggers
+    loggers:
+        javamcp: DEBUG       # Application logger - more verbose
+        uvicorn: WARNING     # Suppress uvicorn info logs
+        uvicorn.access: ERROR  # Suppress access logs
+        fastmcp: INFO        # FastMCP library
+
+    # Legacy format (still supported for backward compatibility)
+    # level: INFO  # Sets root level when root section is not specified
 ```
 
 **Repository Cloning Behavior:**
@@ -310,9 +321,17 @@ logging:
 
 **Logging Configuration:**
 
+- **Hierarchical Configuration**: Configure root logger and per-library log levels
+  - `root.level`: Default log level for all loggers (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+  - `loggers`: Dict mapping logger names to their individual levels
+- **Per-Logger Control**: Set different log levels for each library:
+  - `javamcp`: Application logs
+  - `uvicorn`, `uvicorn.access`: Web server logs
+  - `fastmcp`: MCP framework logs
+  - `asyncio`: Async runtime logs
+- **Legacy Support**: Existing configs with top-level `level` field still work
 - **Default Format**: `2025-10-25 18:25:55 - javamcp - INFO - Message`
-- **Unified Format**: All logs (javamcp, FastMCP, Uvicorn, third-party
-  libraries) use the same format
+- **Unified Format**: All logs use the same format string
 - **Color-Coded Levels**: Log levels are displayed in different colors in
   terminal output:
     - `DEBUG` - Bright Cyan
@@ -324,8 +343,6 @@ logging:
   redirected or piped
 - **File Output**: Log files never contain color codes (always plain text)
 - **Customizable**: Both format and date_format can be customized via config.yml
-- **Third-Party Integration**: Uvicorn, FastMCP, and other library loggers are
-  automatically configured
 - **Available Format Variables**: All Python logging format variables are
   supported:
     - `%(asctime)s` - Timestamp

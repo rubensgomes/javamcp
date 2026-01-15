@@ -106,14 +106,21 @@ logging:
 EXAMPLES
 ========
 
-  # Run with default config (~/.config/javamcp/config.yml)
-  python -m javamcp
-
-  # Run with custom config file
-  python -m javamcp --config /path/to/config.yml
+  # You must have poetry installed, then run:
+  poetry install
 
   # Show version
-  python -m javamcp --version
+  poetry run python -m javamcp --version
+
+  # Show help
+  poetry run python -m javamcp --help
+
+  # Run with default config (~/.config/javamcp/config.yml)
+  poetry run python -m javamcp
+
+  # Run with custom config file
+  poetry run python -m javamcp --config /path/to/config.yml
+
 
 For more information, see: https://github.com/rubensgomes/javamcp
 """
@@ -311,7 +318,6 @@ MCP Resources:
         setup_signal_handlers(logger)
 
         # Initialize server state
-        logger.info("Initializing JavaMCP server...")
         initialize_server(config_path)
         logger.info("Server initialized successfully")
         logger.info("Starting FastMCP server...")
