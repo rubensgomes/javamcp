@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.0] - 2026-01-14
+
+### Added
+- **Comprehensive Logging Throughout Codebase**
+  - Added logging to 11 modules for improved troubleshooting and observability
+  - MCP tool invocation logging with `log_tool_invocation()` for all 4 tools and 1 resource
+  - Repository lifecycle logging (initialization, clone, update operations)
+  - Git operation logging (clone, pull, checkout with success/failure status)
+  - Parse operation logging with detailed file and result tracking
+  - Index operation logging (add_classes, reindex, clear)
+  - Query engine logging with search parameters and result counts
+  - Configuration loading and validation logging
+  - AST visitor logging for class/interface/enum extraction
+  - Javadoc parser logging with extraction statistics
+  - Context builder logging for class context generation
+
+### Fixed
+- **Silent Exception Handlers**
+  - Fixed 6 silent exception handlers in `project_context_builder.py` that were hiding failures
+  - All exceptions now properly logged with appropriate severity levels
+
+### Technical
+- All 287 tests passing
+- Pylint score: 9.77/10 (improved from 9.75/10)
+- Backward compatible - no breaking changes
+
 ## [0.13.0] - 2026-01-14
 
 ### Added

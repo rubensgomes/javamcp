@@ -44,6 +44,7 @@ from pathlib import Path
 from typing import Optional
 
 from javamcp.config.schema import RepositoryConfig
+from javamcp.logging import get_logger, log_repository_operation
 from javamcp.models.repository import RepositoryIndex, RepositoryMetadata
 
 from .exceptions import RepositoryNotFoundError
@@ -54,6 +55,9 @@ from .git_operations import (
     is_git_repository,
     pull_repository,
 )
+
+# Module-level logger
+logger = get_logger("repository.manager")
 
 
 class RepositoryManager:
@@ -77,27 +81,46 @@ class RepositoryManager:
         Initialize all repositories from configuration.
         Clones new repositories and optionally updates existing ones.
         """
+        logger.info(
+            "Initializing %d repositories from configuration",
+            len(self.config.urls),
+        )
         base_path = Path(self.config.local_base_path)
         base_path.mkdir(parents=True, exist_ok=True)
 
         for url in self.config.urls:
             repo_name = self._get_repo_name_from_url(url)
             local_path = base_path / repo_name
+            logger.debug("Processing repository: %s -> %s", url, local_path)
 
             if local_path.exists() and is_git_repository(str(local_path)):
                 # Repository already exists
                 if self.config.auto_update:
+                    logger.info("Updating existing repository: %s", repo_name)
                     self._update_repository(url, str(local_path))
                 else:
+                    logger.debug(
+                        "Loading existing repository (auto_update=False): %s",
+                        repo_name,
+                    )
                     self._load_existing_repository(url, str(local_path))
             else:
                 # Clone new repository
+                logger.info("Cloning new repository: %s", repo_name)
                 self._clone_new_repository(url, str(local_path))
+
+        logger.info(
+            "Repository initialization complete: %d repositories loaded",
+            len(self.repositories),
+        )
 
     def clone_all_repositories(self) -> None:
         """
         Clone all configured repositories (skip if already exists).
         """
+        logger.info(
+            "Starting clone_all_repositories for %d URLs", len(self.config.urls)
+        )
         base_path = Path(self.config.local_base_path)
         base_path.mkdir(parents=True, exist_ok=True)
 
@@ -106,7 +129,10 @@ class RepositoryManager:
             local_path = base_path / repo_name
 
             if not local_path.exists():
+                logger.info("Cloning repository: %s", repo_name)
                 self._clone_new_repository(url, str(local_path))
+            else:
+                logger.debug("Skipping existing repository: %s", repo_name)
 
     def update_repository(self, url: str) -> None:
         """
@@ -118,11 +144,14 @@ class RepositoryManager:
         Raises:
             RepositoryNotFoundError: If repository not found
         """
+        logger.info("Updating repository: %s", url)
         if url not in self.repositories:
+            logger.error("Repository not managed: %s", url)
             raise RepositoryNotFoundError(f"Repository not managed: {url}")
 
         metadata = self.repositories[url]
         self._update_repository(url, metadata.local_path)
+        log_repository_operation(logger, "update", url, "success")
 
     def get_java_files(self, url: str) -> list[Path]:
         """
@@ -137,13 +166,16 @@ class RepositoryManager:
         Raises:
             RepositoryNotFoundError: If repository not found
         """
+        logger.debug("Getting Java files for repository: %s", url)
         if url not in self.repositories:
+            logger.error("Repository not managed: %s", url)
             raise RepositoryNotFoundError(f"Repository not managed: {url}")
 
         metadata = self.repositories[url]
         repo_path = Path(metadata.local_path)
 
         java_files = list(repo_path.rglob("*.java"))
+        logger.debug("Found %d Java files in %s", len(java_files), url)
         return java_files
 
     def filter_java_files_by_package(self, url: str, package_path: str) -> list[Path]:
@@ -225,47 +257,71 @@ class RepositoryManager:
 
     def _clone_new_repository(self, url: str, local_path: str) -> None:
         """Clone a new repository and track metadata."""
-        clone_repository(url, local_path, depth=1)
+        logger.info("Cloning repository %s to %s", url, local_path)
+        try:
+            clone_repository(url, local_path, depth=1)
+            log_repository_operation(logger, "clone", url, "success")
 
-        commit_hash = get_current_commit_hash(local_path)
-        branch_name = get_current_branch_name(local_path) or "unknown"
-        now = datetime.now()
+            commit_hash = get_current_commit_hash(local_path)
+            branch_name = get_current_branch_name(local_path) or "unknown"
+            now = datetime.now()
 
-        metadata = RepositoryMetadata(
-            url=url,
-            branch=branch_name,
-            local_path=local_path,
-            last_cloned=now,
-            last_updated=now,
-            commit_hash=commit_hash,
-        )
-
-        self.repositories[url] = metadata
-
-    def _update_repository(self, url: str, local_path: str) -> None:
-        """Pull latest changes and update metadata."""
-        pull_repository(local_path)
-
-        commit_hash = get_current_commit_hash(local_path)
-        branch_name = get_current_branch_name(local_path) or "unknown"
-        now = datetime.now()
-
-        if url in self.repositories:
-            self.repositories[url].last_updated = now
-            self.repositories[url].commit_hash = commit_hash
-            self.repositories[url].branch = branch_name
-        else:
             metadata = RepositoryMetadata(
                 url=url,
                 branch=branch_name,
                 local_path=local_path,
+                last_cloned=now,
                 last_updated=now,
                 commit_hash=commit_hash,
             )
+
             self.repositories[url] = metadata
+            logger.debug(
+                "Repository cloned: branch=%s, commit=%s",
+                branch_name,
+                commit_hash[:8] if commit_hash else "unknown",
+            )
+        except Exception as e:
+            log_repository_operation(logger, "clone", url, f"failed: {e}")
+            raise
+
+    def _update_repository(self, url: str, local_path: str) -> None:
+        """Pull latest changes and update metadata."""
+        logger.debug("Pulling latest changes for %s", url)
+        try:
+            pull_repository(local_path)
+            log_repository_operation(logger, "pull", url, "success")
+
+            commit_hash = get_current_commit_hash(local_path)
+            branch_name = get_current_branch_name(local_path) or "unknown"
+            now = datetime.now()
+
+            if url in self.repositories:
+                self.repositories[url].last_updated = now
+                self.repositories[url].commit_hash = commit_hash
+                self.repositories[url].branch = branch_name
+            else:
+                metadata = RepositoryMetadata(
+                    url=url,
+                    branch=branch_name,
+                    local_path=local_path,
+                    last_updated=now,
+                    commit_hash=commit_hash,
+                )
+                self.repositories[url] = metadata
+
+            logger.debug(
+                "Repository updated: branch=%s, commit=%s",
+                branch_name,
+                commit_hash[:8] if commit_hash else "unknown",
+            )
+        except Exception as e:
+            log_repository_operation(logger, "pull", url, f"failed: {e}")
+            raise
 
     def _load_existing_repository(self, url: str, local_path: str) -> None:
         """Load metadata for existing repository without updating."""
+        logger.debug("Loading existing repository metadata: %s", url)
         commit_hash = get_current_commit_hash(local_path)
         branch_name = get_current_branch_name(local_path) or "unknown"
 
@@ -277,3 +333,8 @@ class RepositoryManager:
         )
 
         self.repositories[url] = metadata
+        logger.debug(
+            "Loaded repository: branch=%s, commit=%s",
+            branch_name,
+            commit_hash[:8] if commit_hash else "unknown",
+        )

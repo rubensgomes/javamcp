@@ -46,10 +46,14 @@ from antlr4.error.ErrorListener import ErrorListener
 
 from javamcp.antlr4.JavaLexer import JavaLexer
 from javamcp.antlr4.JavaParser import JavaParser
+from javamcp.logging import get_logger, log_parse_operation
 from javamcp.models.java_entities import JavaClass
 
 from .ast_visitor import JavaASTVisitor
 from .exceptions import InvalidJavaSourceError, ParseError
+
+# Module-level logger
+logger = get_logger("parser.java")
 
 
 class JavaParseErrorListener(ErrorListener):
@@ -90,17 +94,23 @@ class JavaSourceParser:
             InvalidJavaSourceError: If file cannot be parsed
             ParseError: If parsing fails
         """
+        logger.debug("Parsing file: %s", file_path)
         path = Path(file_path)
         if not path.exists():
+            logger.error("File not found: %s", file_path)
             raise InvalidJavaSourceError(f"File not found: {file_path}")
 
         if not path.is_file():
+            logger.error("Not a file: %s", file_path)
             raise InvalidJavaSourceError(f"Not a file: {file_path}")
 
         try:
             input_stream = FileStream(str(path), encoding="utf-8")
-            return self._parse_stream(input_stream, str(path))
+            result = self._parse_stream(input_stream, str(path))
+            log_parse_operation(logger, file_path, "success")
+            return result
         except Exception as e:
+            log_parse_operation(logger, file_path, "failed", str(e))
             raise ParseError(f"Failed to parse file {file_path}: {e}") from e
 
     def parse_string(
@@ -120,10 +130,16 @@ class JavaSourceParser:
             InvalidJavaSourceError: If source cannot be parsed
             ParseError: If parsing fails
         """
+        logger.debug(
+            "Parsing source string: %s (%d chars)", source_name, len(source_code)
+        )
         try:
             input_stream = InputStream(source_code)
-            return self._parse_stream(input_stream, source_name)
+            result = self._parse_stream(input_stream, source_name)
+            log_parse_operation(logger, source_name, "success")
+            return result
         except Exception as e:
+            log_parse_operation(logger, source_name, "failed", str(e))
             raise ParseError(f"Failed to parse source {source_name}: {e}") from e
 
     def _parse_stream(self, input_stream, source_name: str) -> JavaClass:
@@ -159,6 +175,7 @@ class JavaSourceParser:
         # Check for errors
         if self.error_listener.errors:
             error_msg = "; ".join(self.error_listener.errors)
+            logger.warning("Parse errors in %s: %s", source_name, error_msg)
             raise InvalidJavaSourceError(f"Parse errors in {source_name}: {error_msg}")
 
         # Extract package and imports
@@ -170,8 +187,15 @@ class JavaSourceParser:
         java_class = visitor.visit(tree)
 
         if java_class is None:
+            logger.warning("No class definition found in %s", source_name)
             raise InvalidJavaSourceError(f"No class definition found in {source_name}")
 
+        logger.debug(
+            "Successfully parsed %s: class=%s, methods=%d",
+            source_name,
+            java_class.name,
+            len(java_class.methods),
+        )
         return java_class
 
     def _extract_package(self, tree) -> str:

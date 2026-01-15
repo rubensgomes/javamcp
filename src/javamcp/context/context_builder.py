@@ -41,9 +41,13 @@ Context builder for creating rich contextual information about Java APIs.
 
 from typing import Optional
 
+from javamcp.logging import get_logger
 from javamcp.models.java_entities import JavaClass, JavaMethod
 
 from .formatter import format_class_context, format_method_context
+
+# Module-level logger
+logger = get_logger("context.builder")
 
 
 class ContextBuilder:
@@ -64,6 +68,11 @@ class ContextBuilder:
         Returns:
             Dictionary containing formatted class context
         """
+        logger.debug(
+            "Building context for class: %s (include_methods=%s)",
+            java_class.fully_qualified_name,
+            include_methods,
+        )
         context = {
             "name": java_class.name,
             "fully_qualified_name": java_class.fully_qualified_name,
@@ -167,6 +176,7 @@ class ContextBuilder:
         Returns:
             List of context dictionaries
         """
+        logger.debug("Aggregating contexts for %d classes", len(java_classes))
         return [self.build_class_context(cls) for cls in java_classes]
 
     def _get_class_type(self, java_class: JavaClass) -> str:

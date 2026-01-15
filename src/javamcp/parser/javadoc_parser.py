@@ -42,9 +42,13 @@ Javadoc comment parser.
 import re
 from typing import Optional
 
+from javamcp.logging import get_logger
 from javamcp.models.java_entities import JavaDoc
 
 from .exceptions import JavaDocParseError
+
+# Module-level logger
+logger = get_logger("parser.javadoc")
 
 
 def parse_javadoc(javadoc_text: Optional[str]) -> Optional[JavaDoc]:
@@ -61,8 +65,10 @@ def parse_javadoc(javadoc_text: Optional[str]) -> Optional[JavaDoc]:
         JavaDocParseError: If parsing fails
     """
     if not javadoc_text or not javadoc_text.strip():
+        logger.debug("Empty javadoc text, returning None")
         return None
 
+    logger.debug("Parsing javadoc (%d chars)", len(javadoc_text))
     try:
         # Remove /** and */ delimiters and leading asterisks
         cleaned = _clean_javadoc(javadoc_text)
@@ -83,7 +89,7 @@ def parse_javadoc(javadoc_text: Optional[str]) -> Optional[JavaDoc]:
         author = _extract_author_tags(cleaned)
         examples = _extract_example_tags(cleaned)
 
-        return JavaDoc(
+        result = JavaDoc(
             summary=summary,
             description=description,
             params=params,
@@ -95,7 +101,15 @@ def parse_javadoc(javadoc_text: Optional[str]) -> Optional[JavaDoc]:
             author=author,
             examples=examples,
         )
+        logger.debug(
+            "Javadoc parsed: params=%d, throws=%d, examples=%d",
+            len(params),
+            len(throws),
+            len(examples),
+        )
+        return result
     except Exception as e:
+        logger.error("Failed to parse javadoc: %s", e)
         raise JavaDocParseError(f"Failed to parse Javadoc: {e}") from e
 
 

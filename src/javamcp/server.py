@@ -49,6 +49,7 @@ from javamcp.config.schema import ApplicationConfig, RepositoryConfig
 from javamcp.context.context_builder import ContextBuilder
 from javamcp.indexer.indexer import APIIndexer
 from javamcp.indexer.query_engine import QueryEngine
+from javamcp.logging import get_logger, log_tool_invocation
 from javamcp.models.mcp_protocol import (
     AnalyzeClassRequest,
     AnalyzeClassResponse,
@@ -64,6 +65,9 @@ from javamcp.parser.java_parser import JavaSourceParser
 from javamcp.repository.manager import RepositoryManager
 from javamcp.resources.project_context_builder import ProjectContextBuilder
 from javamcp.server_factory import get_mcp_server
+
+# Module-level logger for server operations
+logger = get_logger("server")
 
 
 # Global state for shared components
@@ -87,14 +91,23 @@ def initialize_server(config_path: str = None) -> None:
     Args:
         config_path: Optional path to configuration file
     """
+    logger.info("Initializing server with configuration from: %s", config_path)
     _state.config = load_config(config_path)
+
+    logger.info(
+        "Creating repository manager for %d repositories",
+        len(_state.config.repositories.urls),
+    )
     _state.repository_manager = RepositoryManager(_state.config.repositories)
+
     _state.indexer = APIIndexer()
     _state.query_engine = QueryEngine(_state.indexer)
 
     # Initialize repositories
+    logger.info("Initializing repositories: %s", _state.config.repositories.urls)
     _state.repository_manager.initialize_repositories()
 
+    logger.info("Server initialization complete")
     _state.initialized = True
 
 
@@ -142,7 +155,16 @@ def search_methods(
     Returns:
         Dictionary with matching methods and context
     """
+    log_tool_invocation(
+        logger,
+        "search_methods",
+        method_name=method_name,
+        class_name=class_name,
+        case_sensitive=case_sensitive,
+    )
+
     if not _state.initialized:
+        logger.warning("search_methods called but server not initialized")
         return {
             "error": "Server not initialized",
             "methods": [],
@@ -176,6 +198,11 @@ def search_methods(
         query=request,
     )
 
+    logger.info(
+        "search_methods completed: found %d methods matching '%s'",
+        len(methods_with_context),
+        method_name,
+    )
     return response.model_dump()
 
 
@@ -197,7 +224,15 @@ def analyze_class(
     Returns:
         Dictionary with complete class analysis and context
     """
+    log_tool_invocation(
+        logger,
+        "analyze_class",
+        fully_qualified_name=fully_qualified_name,
+        repository_name=repository_name,
+    )
+
     if not _state.initialized:
+        logger.warning("analyze_class called but server not initialized")
         return {"error": "Server not initialized", "found": False, "matches": 0}
 
     request = AnalyzeClassRequest(
@@ -211,6 +246,7 @@ def analyze_class(
     java_class = _state.query_engine.search_class(request.fully_qualified_name)
 
     if not java_class:
+        logger.info("analyze_class: class '%s' not found", fully_qualified_name)
         response = AnalyzeClassResponse(found=False, matches=0)
         return response.model_dump()
 
@@ -232,6 +268,11 @@ def analyze_class(
         matches=1,
     )
 
+    logger.info(
+        "analyze_class completed: found class '%s' with %d methods",
+        fully_qualified_name,
+        len(java_class.methods),
+    )
     return response.model_dump()
 
 
@@ -257,7 +298,17 @@ def extract_apis(  # pylint: disable=too-many-locals
     Returns:
         Dictionary with extracted classes and context
     """
+    log_tool_invocation(
+        logger,
+        "extract_apis",
+        repository_url=repository_url,
+        branch=branch,
+        package_filter=package_filter,
+        class_filter=class_filter,
+    )
+
     if not _state.initialized:
+        logger.warning("extract_apis called but server not initialized")
         return {
             "error": "Server not initialized",
             "classes": [],
@@ -286,6 +337,7 @@ def extract_apis(  # pylint: disable=too-many-locals
 
     # Get Java files
     java_files = repo_manager.get_java_files(request.repository_url)
+    logger.info("extract_apis: found %d Java files in repository", len(java_files))
 
     # Filter by package if specified
     if request.package_filter:
@@ -311,8 +363,9 @@ def extract_apis(  # pylint: disable=too-many-locals
             # Index the class
             _state.indexer.add_class(java_class, request.repository_url)
 
-        except Exception:  # pylint: disable=broad-exception-caught
-            # Skip files that fail to parse
+        except Exception as e:  # pylint: disable=broad-exception-caught
+            # Log and skip files that fail to parse
+            logger.warning("Failed to parse file %s: %s", java_file, e)
             continue
 
     # Build context for response
@@ -335,6 +388,12 @@ def extract_apis(  # pylint: disable=too-many-locals
         branch=actual_branch,
     )
 
+    logger.info(
+        "extract_apis completed: extracted %d classes with %d methods from %s",
+        len(parsed_classes),
+        total_methods,
+        repository_url,
+    )
     return response.model_dump()
 
 
@@ -358,7 +417,16 @@ def generate_guide(  # pylint: disable=too-many-locals
     Returns:
         Dictionary with formatted usage guide and relevant APIs
     """
+    log_tool_invocation(
+        logger,
+        "generate_guide",
+        use_case=use_case,
+        repository_filter=repository_filter,
+        max_results=max_results,
+    )
+
     if not _state.initialized:
+        logger.warning("generate_guide called but server not initialized")
         return {
             "error": "Server not initialized",
             "guide": "",
@@ -395,6 +463,12 @@ def generate_guide(  # pylint: disable=too-many-locals
     # Limit results
     relevant_classes = relevant_classes[: request.max_results]
     relevant_methods = relevant_methods[: request.max_results]
+
+    logger.info(
+        "generate_guide: found %d relevant classes and %d relevant methods",
+        len(relevant_classes),
+        len(relevant_methods),
+    )
 
     # Build formatted guide
     guide_lines = []
@@ -461,13 +535,19 @@ def get_project_context(repository_name: str) -> str:
     Returns:
         JSON string with complete project context
     """
+    logger.info("get_project_context invoked for repository: %s", repository_name)
+
     if not _state.initialized:
+        logger.warning("get_project_context called but server not initialized")
         return '{"error": "Server not initialized"}'
 
     # Find repository by name
     metadata = _state.repository_manager.get_repository_by_name(repository_name)
 
     if not metadata:
+        logger.warning(
+            "get_project_context: repository '%s' not found", repository_name
+        )
         return f'{{"error": "Repository not found: {repository_name}"}}'
 
     # Build project context
@@ -481,4 +561,5 @@ def get_project_context(repository_name: str) -> str:
 
     # Return as formatted response
     response = ProjectContextResponse(**context)
+    logger.info("get_project_context completed for repository: %s", repository_name)
     return response.model_dump_json(indent=2)

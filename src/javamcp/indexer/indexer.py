@@ -42,7 +42,11 @@ API indexer for organizing parsed Java classes and methods.
 from collections import defaultdict
 from typing import Optional
 
+from javamcp.logging import get_logger
 from javamcp.models.java_entities import JavaClass, JavaMethod
+
+# Module-level logger
+logger = get_logger("indexer")
 
 
 class APIIndexer:
@@ -112,8 +116,14 @@ class APIIndexer:
             java_classes: List of JavaClass objects to index
             repository_url: Repository URL these classes belong to
         """
+        logger.info("Indexing %d classes from %s", len(java_classes), repository_url)
         for java_class in java_classes:
             self.add_class(java_class, repository_url)
+        logger.debug(
+            "Indexing complete: total classes=%d, total methods=%d",
+            self.get_total_classes(),
+            self.get_total_methods(),
+        )
 
     def reindex_repository(
         self, repository_url: str, java_classes: list[JavaClass]
@@ -125,6 +135,11 @@ class APIIndexer:
             repository_url: Repository URL to re-index
             java_classes: New list of JavaClass objects
         """
+        logger.info(
+            "Re-indexing repository: %s with %d classes",
+            repository_url,
+            len(java_classes),
+        )
         # Remove old classes from this repository
         self._remove_repository(repository_url)
 
@@ -243,6 +258,11 @@ class APIIndexer:
 
     def clear(self) -> None:
         """Clear all indices."""
+        logger.info(
+            "Clearing all indices: %d classes, %d methods",
+            self.get_total_classes(),
+            self.get_total_methods(),
+        )
         self.class_index.clear()
         self.class_name_index.clear()
         self.package_index.clear()
@@ -254,10 +274,18 @@ class APIIndexer:
     def _remove_repository(self, repository_url: str) -> None:
         """Remove all classes from a repository."""
         if repository_url not in self.repository_index:
+            logger.debug(
+                "Repository not in index, skipping removal: %s", repository_url
+            )
             return
 
         # Get classes to remove
         classes_to_remove = self.repository_index[repository_url]
+        logger.debug(
+            "Removing %d classes from index for: %s",
+            len(classes_to_remove),
+            repository_url,
+        )
 
         for java_class in classes_to_remove:
             # Remove from class index

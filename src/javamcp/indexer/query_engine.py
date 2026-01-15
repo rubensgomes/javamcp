@@ -41,10 +41,14 @@ Query engine for searching and filtering indexed Java APIs.
 
 from typing import Optional
 
+from javamcp.logging import get_logger
 from javamcp.models.java_entities import JavaClass, JavaMethod
 
 from .exceptions import IndexNotBuiltError, RepositoryNotIndexedError
 from .indexer import APIIndexer
+
+# Module-level logger
+logger = get_logger("indexer.query")
 
 
 class QueryEngine:
@@ -81,6 +85,12 @@ class QueryEngine:
         Raises:
             IndexNotBuiltError: If index is not built
         """
+        logger.debug(
+            "Searching methods: name=%s, class=%s, case_sensitive=%s",
+            method_name,
+            class_name,
+            case_sensitive,
+        )
         if not self.indexer.is_built():
             raise IndexNotBuiltError("Index has not been built")
 
@@ -113,6 +123,7 @@ class QueryEngine:
         else:
             results = matching_methods
 
+        logger.debug("Method search returned %d results", len(results))
         return results
 
     def search_methods_partial(
@@ -131,6 +142,11 @@ class QueryEngine:
         Raises:
             IndexNotBuiltError: If index is not built
         """
+        logger.debug(
+            "Searching methods partial: pattern=%s, case_sensitive=%s",
+            method_name_pattern,
+            case_sensitive,
+        )
         if not self.indexer.is_built():
             raise IndexNotBuiltError("Index has not been built")
 
@@ -145,6 +161,7 @@ class QueryEngine:
                 if method_name_pattern.lower() in name.lower():
                     results.extend(methods)
 
+        logger.debug("Partial method search returned %d results", len(results))
         return results
 
     def search_class(
@@ -163,16 +180,23 @@ class QueryEngine:
         Raises:
             IndexNotBuiltError: If index is not built
         """
+        logger.debug(
+            "Searching class: name=%s, case_sensitive=%s", class_name, case_sensitive
+        )
         if not self.indexer.is_built():
             raise IndexNotBuiltError("Index has not been built")
 
         if case_sensitive:
-            return self.indexer.get_class_by_fqn(class_name)
+            result = self.indexer.get_class_by_fqn(class_name)
+            logger.debug("Class search result: %s", "found" if result else "not found")
+            return result
 
         # Case-insensitive search
         for fqn, java_class in self.indexer.class_index.items():
             if fqn.lower() == class_name.lower():
+                logger.debug("Class search result: found (case-insensitive match)")
                 return java_class
+        logger.debug("Class search result: not found")
         return None
 
     def filter_classes_by_repository(self, repository_url: str) -> list[JavaClass]:
@@ -189,14 +213,17 @@ class QueryEngine:
             IndexNotBuiltError: If index is not built
             RepositoryNotIndexedError: If repository not in index
         """
+        logger.debug("Filtering classes by repository: %s", repository_url)
         if not self.indexer.is_built():
             raise IndexNotBuiltError("Index has not been built")
 
         classes = self.indexer.get_classes_by_repository(repository_url)
 
         if not classes:
+            logger.warning("Repository not indexed: %s", repository_url)
             raise RepositoryNotIndexedError(f"Repository not indexed: {repository_url}")
 
+        logger.debug("Found %d classes in repository", len(classes))
         return classes
 
     def filter_classes_by_package(

@@ -44,6 +44,7 @@ from typing import Optional
 from antlr4 import ParserRuleContext
 
 from javamcp.antlr4.JavaParserListener import JavaParserListener
+from javamcp.logging import get_logger
 from javamcp.models.java_entities import (
     JavaAnnotation,
     JavaClass,
@@ -51,6 +52,9 @@ from javamcp.models.java_entities import (
     JavaMethod,
     JavaParameter,
 )
+
+# Module-level logger
+logger = get_logger("parser.ast")
 
 
 class JavaASTVisitor(JavaParserListener):
@@ -83,21 +87,26 @@ class JavaASTVisitor(JavaParserListener):
         Returns:
             JavaClass model or None
         """
+        logger.debug("Visiting AST for source: %s", self.source_name)
         # Find the first type declaration (class, interface, enum)
         if hasattr(tree, "typeDeclaration") and tree.typeDeclaration():
             for type_decl in tree.typeDeclaration():
                 if type_decl.classDeclaration():
+                    logger.debug("Found class declaration in %s", self.source_name)
                     self.java_class = self._extract_class(type_decl.classDeclaration())
                     return self.java_class
                 if type_decl.interfaceDeclaration():
+                    logger.debug("Found interface declaration in %s", self.source_name)
                     self.java_class = self._extract_interface(
                         type_decl.interfaceDeclaration()
                     )
                     return self.java_class
                 if type_decl.enumDeclaration():
+                    logger.debug("Found enum declaration in %s", self.source_name)
                     self.java_class = self._extract_enum(type_decl.enumDeclaration())
                     return self.java_class
 
+        logger.debug("No type declaration found in %s", self.source_name)
         return None
 
     def _extract_class(self, class_ctx) -> JavaClass:

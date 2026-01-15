@@ -86,6 +86,10 @@ poetry run python -m javamcp -h
 ### Running the Server
 
 ```bash
+cd javamcp
+# use the config.yml file at ~/.config/javamcp/config.yml
+poetry run python -m javamcp
+# use the config.yml file located at this folder
 poetry run python -m javamcp --config config.yml
 ```
 

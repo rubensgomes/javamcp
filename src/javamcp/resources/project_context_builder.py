@@ -45,7 +45,11 @@ from typing import Optional
 from javamcp.context.context_builder import ContextBuilder
 from javamcp.indexer.indexer import APIIndexer
 from javamcp.indexer.query_engine import QueryEngine
+from javamcp.logging import get_logger
 from javamcp.repository.manager import RepositoryManager
+
+# Module-level logger
+logger = get_logger("resources.project_context")
 
 
 class ProjectContextBuilder:
@@ -85,8 +89,10 @@ class ProjectContextBuilder:
         Returns:
             Dictionary containing complete project context
         """
+        logger.info("Building project context for: %s", repository_url)
         metadata = self.repository_manager.get_repository_metadata(repository_url)
         if not metadata:
+            logger.warning("Repository not found: %s", repository_url)
             return {"error": f"Repository not found: {repository_url}"}
 
         repo_path = Path(metadata.local_path)
@@ -104,6 +110,11 @@ class ProjectContextBuilder:
             "javadoc_coverage": self._calculate_javadoc_coverage(repository_url),
         }
 
+        logger.info(
+            "Project context built: %d packages, %d classes",
+            len(context["packages"]),
+            context["statistics"]["total_classes"],
+        )
         return context
 
     def _extract_repository_name(self, repository_url: str) -> str:
@@ -137,10 +148,14 @@ class ProjectContextBuilder:
             readme_path = repo_path / readme_name
             if readme_path.exists() and readme_path.is_file():
                 try:
-                    return readme_path.read_text(encoding="utf-8")
-                except (OSError, UnicodeDecodeError):
+                    content = readme_path.read_text(encoding="utf-8")
+                    logger.debug("Found README at: %s", readme_path)
+                    return content
+                except (OSError, UnicodeDecodeError) as e:
+                    logger.warning("Failed to read README at %s: %s", readme_path, e)
                     continue
 
+        logger.debug("No README found in repository: %s", repo_path)
         return None
 
     def _extract_llms_txt(self, repo_path: Path) -> Optional[str]:
@@ -159,10 +174,14 @@ class ProjectContextBuilder:
             llms_path = repo_path / llms_name
             if llms_path.exists() and llms_path.is_file():
                 try:
-                    return llms_path.read_text(encoding="utf-8")
-                except (OSError, UnicodeDecodeError):
+                    content = llms_path.read_text(encoding="utf-8")
+                    logger.debug("Found llms.txt at: %s", llms_path)
+                    return content
+                except (OSError, UnicodeDecodeError) as e:
+                    logger.warning("Failed to read llms.txt at %s: %s", llms_path, e)
                     continue
 
+        logger.debug("No llms.txt found in repository: %s", repo_path)
         return None
 
     def _build_api_statistics(self, repository_url: str) -> dict:
@@ -181,7 +200,7 @@ class ProjectContextBuilder:
 
             packages = set(cls.package for cls in classes)
 
-            return {
+            stats = {
                 "total_classes": len(classes),
                 "total_methods": total_methods,
                 "total_packages": len(packages),
@@ -189,7 +208,12 @@ class ProjectContextBuilder:
                     round(total_methods / len(classes), 2) if classes else 0
                 ),
             }
-        except Exception:  # pylint: disable=broad-exception-caught
+            logger.debug("API statistics for %s: %s", repository_url, stats)
+            return stats
+        except Exception as e:  # pylint: disable=broad-exception-caught
+            logger.warning(
+                "Failed to build API statistics for %s: %s", repository_url, e
+            )
             return {
                 "total_classes": 0,
                 "total_methods": 0,
@@ -229,10 +253,17 @@ class ProjectContextBuilder:
                     }
                 )
 
-            return sorted(
+            result = sorted(
                 package_summaries, key=lambda x: x["class_count"], reverse=True
             )
-        except Exception:  # pylint: disable=broad-exception-caught
+            logger.debug(
+                "Built package summary for %s: %d packages", repository_url, len(result)
+            )
+            return result
+        except Exception as e:  # pylint: disable=broad-exception-caught
+            logger.warning(
+                "Failed to build package summary for %s: %s", repository_url, e
+            )
             return []
 
     def _build_top_classes_summary(
@@ -275,8 +306,16 @@ class ProjectContextBuilder:
                     }
                 )
 
+            logger.debug(
+                "Built top classes summary for %s: %d classes",
+                repository_url,
+                len(top_classes),
+            )
             return top_classes
-        except Exception:  # pylint: disable=broad-exception-caught
+        except Exception as e:  # pylint: disable=broad-exception-caught
+            logger.warning(
+                "Failed to build top classes summary for %s: %s", repository_url, e
+            )
             return []
 
     def _calculate_javadoc_coverage(self, repository_url: str) -> dict:
@@ -300,7 +339,7 @@ class ProjectContextBuilder:
                 sum(1 for method in cls.methods if method.javadoc) for cls in classes
             )
 
-            return {
+            coverage = {
                 "class_documentation_rate": (
                     round((classes_with_javadoc / total_classes) * 100, 2)
                     if total_classes > 0
@@ -316,7 +355,12 @@ class ProjectContextBuilder:
                 "documented_methods": methods_with_javadoc,
                 "total_methods": total_methods,
             }
-        except Exception:  # pylint: disable=broad-exception-caught
+            logger.debug("Javadoc coverage for %s: %s", repository_url, coverage)
+            return coverage
+        except Exception as e:  # pylint: disable=broad-exception-caught
+            logger.warning(
+                "Failed to calculate javadoc coverage for %s: %s", repository_url, e
+            )
             return {
                 "class_documentation_rate": 0,
                 "method_documentation_rate": 0,
