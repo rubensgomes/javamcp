@@ -32,7 +32,7 @@ NOTE:  instructions provided for Unix-based systems (Linux, macOS) only.
 
 ## Configuration
 
-- Create and edit `~/.config/javamcp/config.yml` to add your Git 
+- Create and edit `~/.config/javamcp/config.yml` to add your Git
   repositories. For example:
 
 ```yaml
@@ -92,6 +92,16 @@ poetry run python -m javamcp
 # use the config.yml file located at this folder
 poetry run python -m javamcp --config config.yml
 ```
+
+### Edit Configurations in PyCharm
+
+1. Menu: Run -> Edit Configurations...
+2. Ensure The "Run" drop-down menu shows "poetry (javamcp) Python 3.14.2 ~
+   /.cache/pypoetry/virtualenvs/javamcp-...".
+   See [PyCharm Edit Configurations Image](docs/img/pycharm_edit_configurations.jpg)
+3. Click: "+" -> Python
+4. Select: "module" from the script/module drop-down menu
+5. Type: "javamcp" in the module
 
 ### MCP Tools
 
@@ -328,6 +338,12 @@ javamcp/
     claude update
     ```
 
+- Add "javamcp" MCP server running locally using http:
+
+    ```bash
+    claude claude mcp add --transport http javamcp http://localhost:8000
+    ```
+
 - List configure MCP servers:
 
     ```bash
@@ -355,7 +371,6 @@ javamcp/
    ```
 
 2. Follow the instructions in the cloned repository `DEVSETUP.md` file.
-
 
 ---
 Author:  [Rubens Gomes](https://rubensgomes.com/)

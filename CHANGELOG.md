@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.16.0] - 2026-01-25
+
+### Added
+- **Codebase Workflow Documentation** (`docs/CODEBASE_WORKFLOW.md`)
+  - Complete data flow analysis from startup to MCP tool execution
+  - ANTLR4 parser execution workflow documentation
+  - Indexer and context builder execution patterns
+  - Visual ASCII diagrams of component interactions
+  - Summary table showing when each component executes
+
+- **PyCharm IDE Integration Guide** (`README.md`)
+  - Step-by-step Edit Configurations instructions
+  - Visual guide screenshot (`docs/img/pycharm_edit_configurations.jpg`)
+  - Module-based run configuration setup
+
+- **HTTP Transport Configuration Example** (`README.md`)
+  - `claude mcp add` command for HTTP transport mode
+  - Local server configuration at port 8000
+
+### Changed
+- **Dependency Updates**
+  - `fastmcp`: 2.14.1 → 3.0.0b1 (major version beta)
+
+### Technical
+- All 307 tests passing
+- Pylint score: 9.77/10
+- Backward compatible (API unchanged)
+
 ## [0.15.0] - 2026-01-15
 
 ### Added
@@ -573,6 +601,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fast search and filtering capabilities
 - Context-aware responses for AI coding assistants
 
+[0.16.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.16.0
 [0.15.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.15.0
 [0.14.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.14.0
 [0.13.0]: https://github.com/rubensgomes/javamcp/releases/tag/v0.13.0
